@@ -19,6 +19,7 @@ import in.drifted.tools.genopro.model.Birth;
 import in.drifted.tools.genopro.model.Individual;
 import in.drifted.tools.genopro.model.BoundaryRect;
 import in.drifted.tools.genopro.model.Death;
+import in.drifted.tools.genopro.model.DocumentInfo;
 import in.drifted.tools.genopro.model.Family;
 import in.drifted.tools.genopro.model.Gender;
 import in.drifted.tools.genopro.model.GenoDate;
@@ -72,6 +73,20 @@ public class DataParser {
         }
 
         return document;
+    }
+
+    public static DocumentInfo getDocumentInfo(Document document) {
+
+        DocumentInfo documentInfo = null;
+
+        Node documentNode = getSingleNode(document.getDocumentElement(), "Document");
+
+        if (documentNode != null) {
+            Map<String, String> nodeValueMap = getNodeValueMap(documentNode);
+            documentInfo = new DocumentInfo(nodeValueMap.get("Title"), nodeValueMap.get("Description"));
+        }
+
+        return documentInfo;
     }
 
     public static Map<String, GenoMap> getGenoMapMap(Document document) {
