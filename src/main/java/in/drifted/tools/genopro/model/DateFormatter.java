@@ -16,6 +16,7 @@
 package in.drifted.tools.genopro.model;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Map;
 
 public class DateFormatter {
@@ -28,8 +29,8 @@ public class DateFormatter {
         this.prefixReplacementMap = prefixReplacementMap;
     }
 
-    public DateFormatter(String pattern, Map<String, String> prefixReplacementMap) {
-        this.dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
+    public DateFormatter(String pattern, Locale locale, Map<String, String> prefixReplacementMap) {
+        this.dateTimeFormatter = DateTimeFormatter.ofPattern(pattern, locale);
         this.prefixReplacementMap = prefixReplacementMap;
     }
 
