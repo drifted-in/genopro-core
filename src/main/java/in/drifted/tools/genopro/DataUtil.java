@@ -27,7 +27,6 @@ import in.drifted.tools.genopro.model.IndividualParserOptions;
 import in.drifted.tools.genopro.model.PedigreeLink;
 import in.drifted.tools.genopro.model.HorizontalPositionComparator;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,12 +39,12 @@ import org.w3c.dom.Document;
 
 public class DataUtil {
 
-    public static List<GenoMapData> getGenoMapDataList(Document document) {
+    public static List<GenoMapData> getGenoMapDataList(Document document, LocalDate anonymizedSinceLocalDate) {
 
         List<GenoMapData> genoMapDataList = new ArrayList<>();
 
         Map<String, GenoMap> genoMapMap = DataParser.getGenoMapMap(document);
-        Collection<Individual> individualCollection = DataParser.getIndividualCollection(document, genoMapMap, new IndividualParserOptions(true, true, LocalDate.now().minus(Period.ofYears(100))));
+        Collection<Individual> individualCollection = DataParser.getIndividualCollection(document, genoMapMap, new IndividualParserOptions(true, true, anonymizedSinceLocalDate));
         Collection<Family> familyCollection = DataParser.getFamilyCollection(document, genoMapMap, individualCollection);
 
         Map<String, Collection<Individual>> individualMap = new HashMap<>();
