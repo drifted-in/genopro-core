@@ -83,7 +83,10 @@ public class DataParser {
 
         if (documentNode != null) {
             Map<String, String> nodeValueMap = getNodeValueMap(documentNode);
-            documentInfo = new DocumentInfo(nodeValueMap.get("Title"), nodeValueMap.get("Description"));
+            String title = nodeValueMap.get("Title");
+            String description = nodeValueMap.get("Description");
+
+            documentInfo = new DocumentInfo((title != null) ? title : "", (description != null) ? description : "");
         }
 
         return documentInfo;
@@ -196,12 +199,20 @@ public class DataParser {
 
         Collection<Individual> anonymizedIndividualCollection = new HashSet<>();
 
+        boolean anonymizeDatesOnly = localDate.equals(LocalDate.now());
+
         for (Individual individual : individualCollection) {
-            if (individual.isDead() || individual.getBirth() != null && individual.getBirth().hasDate() && individual.getBirth().getDate().getLocalDate().isBefore(localDate)) {
+
+            if (individual.isDead() || !anonymizeDatesOnly && individual.getBirth() != null && individual.getBirth().hasDate() && individual.getBirth().getDate().getLocalDate().isBefore(localDate)) {
                 anonymizedIndividualCollection.add(individual);
 
             } else {
-                anonymizedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(), null, null, individual.getGender(), null, null, false, true, individual.getPosition(), individual.getBoundaryRect()));
+                if (anonymizeDatesOnly) {
+                    anonymizedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(), individual.getHyperlink(), individual.getName(), individual.getGender(), null, null, false, false, individual.getPosition(), individual.getBoundaryRect()));
+
+                } else {
+                    anonymizedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(), null, null, individual.getGender(), null, null, false, true, individual.getPosition(), individual.getBoundaryRect()));
+                }
             }
         }
 
@@ -328,7 +339,13 @@ public class DataParser {
                     bottomBoundaryRect = getBoundaryRect(bottomNodeValueMap.get("Left") + "," + bottomNodeValueMap.get("Right"));
                 }
 
-                familyCollection.add(new Family(id, genoMapMap.get(genoMapName), label, relationType, date, comment, pedigreeLinkList, position, topBoundaryRect, bottomBoundaryRect));
+                GenoMap genoMap = genoMapMap.get(genoMapName);
+
+                if (genoMap == null) {
+                    genoMap = genoMapMap.values().iterator().next();
+                }
+
+                familyCollection.add(new Family(id, genoMap, label, relationType, date, comment, pedigreeLinkList, position, topBoundaryRect, bottomBoundaryRect));
             }
         }
 
@@ -443,7 +460,13 @@ public class DataParser {
         BoundaryRect boundaryRect = getBoundaryRect(positionElement.getAttribute("BoundaryRect"));
         String genoMapName = positionElement.getAttribute("GenoMap");
 
-        return new Individual(id, genoMapMap.get(genoMapName), hyperlink.isEmpty() ? null : new Hyperlink(null, hyperlink), name, gender, birth, death, isDead, false, position, boundaryRect);
+        GenoMap genoMap = genoMapMap.get(genoMapName);
+
+        if (genoMap == null) {
+            genoMap = genoMapMap.values().iterator().next();
+        }
+
+        return new Individual(id, genoMap, hyperlink.isEmpty() ? null : new Hyperlink(null, hyperlink), name, gender, birth, death, isDead, false, position, boundaryRect);
     }
 
     private static Name getName(Element individual) {
