@@ -22,11 +22,10 @@ import in.drifted.tools.genopro.model.FamilyRelation;
 import in.drifted.tools.genopro.model.Gender;
 import in.drifted.tools.genopro.model.GenoMap;
 import in.drifted.tools.genopro.model.GenoMapData;
-import in.drifted.tools.genopro.model.Individual;
-import in.drifted.tools.genopro.model.IndividualParserOptions;
-import in.drifted.tools.genopro.model.PedigreeLink;
 import in.drifted.tools.genopro.model.HorizontalPositionComparator;
-import java.time.LocalDate;
+import in.drifted.tools.genopro.model.Individual;
+import in.drifted.tools.genopro.model.ParserOptions;
+import in.drifted.tools.genopro.model.PedigreeLink;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,12 +38,19 @@ import org.w3c.dom.Document;
 
 public class DataUtil {
 
-    public static List<GenoMapData> getGenoMapDataList(Document document, LocalDate anonymizedSinceLocalDate) {
+    /**
+     * Returns the collection of data for each GenoMap.
+     *
+     * @param document GenoPro XML document
+     * @param parserOptions parser options
+     * @return the collection of data for each GenoMap
+     */
+    public static List<GenoMapData> getGenoMapDataList(Document document, ParserOptions parserOptions) {
 
         List<GenoMapData> genoMapDataList = new ArrayList<>();
 
         Map<String, GenoMap> genoMapMap = DataParser.getGenoMapMap(document);
-        Collection<Individual> individualCollection = DataParser.getIndividualCollection(document, genoMapMap, new IndividualParserOptions(true, true, anonymizedSinceLocalDate));
+        Collection<Individual> individualCollection = DataParser.getIndividualCollection(document, genoMapMap, parserOptions);
         Collection<Family> familyCollection = DataParser.getFamilyCollection(document, genoMapMap, individualCollection);
 
         Map<String, Collection<Individual>> individualMap = new HashMap<>();
@@ -78,10 +84,12 @@ public class DataUtil {
     }
 
     /**
-     * Returns a map of family relations for all individuals.
-     * @param genoMapDataList source data to process
-     * @param individualMap a map of all individuals used for determining father/mother based on horizontal position
-     * @return a map of family relations for all individuals
+     * Returns the map of family relations for all individuals.
+     *
+     * @param genoMapDataList collection of data for each GenoMap
+     * @param individualMap map of all individuals used for determining
+     * father/mother relation based on horizontal position
+     * @return the map of family relations for all individuals
      */
     public static Map<String, FamilyRelation> getFamilyRelationMap(List<GenoMapData> genoMapDataList, Map<String, Individual> individualMap) {
 
@@ -179,6 +187,12 @@ public class DataUtil {
         return familyRelationMap;
     }
 
+    /**
+     * Returns the formatted date
+     * @param date date
+     * @param dateFormatter date formatter
+     * @return the formatted date
+     */
     public static String getFormattedDate(EventDate date, DateFormatter dateFormatter) {
 
         String formattedDate = "";

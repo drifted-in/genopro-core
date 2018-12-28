@@ -16,7 +16,6 @@
 package in.drifted.tools.genopro;
 
 import in.drifted.tools.genopro.model.Birth;
-import in.drifted.tools.genopro.model.Individual;
 import in.drifted.tools.genopro.model.BoundaryRect;
 import in.drifted.tools.genopro.model.Death;
 import in.drifted.tools.genopro.model.DocumentInfo;
@@ -25,9 +24,10 @@ import in.drifted.tools.genopro.model.Gender;
 import in.drifted.tools.genopro.model.GenoDate;
 import in.drifted.tools.genopro.model.GenoMap;
 import in.drifted.tools.genopro.model.Hyperlink;
-import in.drifted.tools.genopro.model.IndividualParserOptions;
+import in.drifted.tools.genopro.model.Individual;
 import in.drifted.tools.genopro.model.Marriage;
 import in.drifted.tools.genopro.model.Name;
+import in.drifted.tools.genopro.model.ParserOptions;
 import in.drifted.tools.genopro.model.PedigreeLink;
 import in.drifted.tools.genopro.model.Position;
 import java.io.IOException;
@@ -54,6 +54,13 @@ import org.xml.sax.SAXException;
 
 public class DataParser {
 
+    /**
+     * Returns the GenoPro XML document.
+     *
+     * @param path path to GenoPro file
+     * @return the GenoPro XML document
+     * @throws IOException
+     */
     public static Document getDocument(Path path) throws IOException {
 
         Document document = null;
@@ -75,6 +82,12 @@ public class DataParser {
         return document;
     }
 
+    /**
+     * Returns the basic info of GenoPro document.
+     *
+     * @param document GenoPro XML document
+     * @return the basic info of GenoPro document
+     */
     public static DocumentInfo getDocumentInfo(Document document) {
 
         DocumentInfo documentInfo = null;
@@ -92,6 +105,12 @@ public class DataParser {
         return documentInfo;
     }
 
+    /**
+     * Returns the map of all GenoMaps.
+     *
+     * @param document GenoPro XML document
+     * @return the map of all GenoMaps
+     */
     public static Map<String, GenoMap> getGenoMapMap(Document document) {
 
         Map<String, GenoMap> genoMapMap = new LinkedHashMap<>();
@@ -116,7 +135,16 @@ public class DataParser {
         return genoMapMap;
     }
 
-    public static Collection<Individual> getIndividualCollection(Document document, Map<String, GenoMap> genoMapMap, IndividualParserOptions parserOptions) {
+    /**
+     * Returns the collection of all individuals. The list can be pre-filtered
+     * if additional options are specified.
+     *
+     * @param document GenoPro XML document
+     * @param genoMapMap map of all GenoMaps
+     * @param parserOptions parser options
+     * @return the collection of all individuals
+     */
+    public static Collection<Individual> getIndividualCollection(Document document, Map<String, GenoMap> genoMapMap, ParserOptions parserOptions) {
 
         Collection<Individual> individualCollection = new HashSet<>();
 
@@ -126,23 +154,23 @@ public class DataParser {
 
             Individual individual = getIndividual(genoMapMap, (Element) nodeList.item(i));
 
-            if (individual.getName() != null || parserOptions.getUnknownIndividuals()) {
+            if (!(individual.getName() == null && parserOptions.isExcludeUnknownIndividuals())) {
                 individualCollection.add(individual);
             }
         }
 
-        if (parserOptions.getResolvedHyperlinks()) {
-            individualCollection = getResolvedIndividualCollection(individualCollection);
+        if (parserOptions.isResolveHyperlinks()) {
+            individualCollection = getResolvedIndividualCollection(individualCollection, parserOptions);
         }
 
         if (parserOptions.getAnonymizedSinceDate() != null) {
-            individualCollection = getAnonymizedIndividualCollection(individualCollection, parserOptions.getAnonymizedSinceDate());
+            individualCollection = getAnonymizedIndividualCollection(individualCollection, parserOptions);
         }
 
         return individualCollection;
     }
 
-    private static Collection<Individual> getResolvedIndividualCollection(Collection<Individual> individualCollection) {
+    private static Collection<Individual> getResolvedIndividualCollection(Collection<Individual> individualCollection, ParserOptions parserOptions) {
 
         Collection<Individual> resolvedIndividualCollection = new HashSet<>();
 
@@ -172,7 +200,7 @@ public class DataParser {
 
                 Hyperlink hyperlink = null;
 
-                if (targetGenoMap.getTitle() != null) {
+                if (!(targetGenoMap.getTitle() == null && parserOptions.isExcludeUntitledGenoMaps())) {
                     hyperlink = new Hyperlink(targetIndividual.getGenoMap(), hyperlinkId);
                 }
 
@@ -195,15 +223,17 @@ public class DataParser {
         return resolvedIndividualCollection;
     }
 
-    private static Collection<Individual> getAnonymizedIndividualCollection(Collection<Individual> individualCollection, LocalDate localDate) {
+    private static Collection<Individual> getAnonymizedIndividualCollection(Collection<Individual> individualCollection, ParserOptions parserOptions) {
 
         Collection<Individual> anonymizedIndividualCollection = new HashSet<>();
 
-        boolean anonymizeDatesOnly = localDate.equals(LocalDate.now());
+        LocalDate anonymizedSinceLocalDate = parserOptions.getAnonymizedSinceDate();
+
+        boolean anonymizeDatesOnly = anonymizedSinceLocalDate.equals(LocalDate.now());
 
         for (Individual individual : individualCollection) {
 
-            if (individual.isDead() || !anonymizeDatesOnly && individual.getBirth() != null && individual.getBirth().hasDate() && individual.getBirth().getDate().getLocalDate().isBefore(localDate)) {
+            if (individual.isDead() || !anonymizeDatesOnly && individual.getBirth() != null && individual.getBirth().hasDate() && individual.getBirth().getDate().getLocalDate().isBefore(anonymizedSinceLocalDate)) {
                 anonymizedIndividualCollection.add(individual);
 
             } else {
@@ -219,6 +249,14 @@ public class DataParser {
         return anonymizedIndividualCollection;
     }
 
+    /**
+     * Returns the collection of all families together with the pedigree links.
+     *
+     * @param document GenoPro XML document
+     * @param genoMapMap map of all GenoMaps
+     * @param individualCollection collection of individuals
+     * @return the collection of all families
+     */
     public static Collection<Family> getFamilyCollection(Document document, Map<String, GenoMap> genoMapMap, Collection<Individual> individualCollection) {
 
         Collection<Family> familyCollection = new HashSet<>();
@@ -353,14 +391,14 @@ public class DataParser {
     }
 
     /**
-     * Returns a map of pedigree links for all families.
+     * Returns the map of pedigree links for all families.
      *
-     * @param document a source document
-     * @param individualCollection a list of individuals, used for determining
-     * link positions
-     * @return a map of pedigree links for all families
+     * @param document GenoPro XML document
+     * @param individualCollection collection of individuals, used for
+     * determining link positions
+     * @return a¨the map of pedigree links for all families
      */
-    private static Map<String, List<PedigreeLink>> getPedigreeLinkMap(Document document, Collection<Individual> individualCollection) {
+    public static Map<String, List<PedigreeLink>> getPedigreeLinkMap(Document document, Collection<Individual> individualCollection) {
 
         Map<String, List<PedigreeLink>> pedigreeLinkMap = new HashMap<>();
 
