@@ -39,7 +39,8 @@ import org.w3c.dom.Document;
 public class DataUtil {
 
     /**
-     * Returns the collection of data for each GenoMap.
+     * Returns the collection of data for each GenoMap. This result can be
+     * pre-filtered if specific parser options are enabled.
      *
      * @param document GenoPro XML document
      * @param parserOptions parser options
@@ -53,30 +54,29 @@ public class DataUtil {
         Collection<Individual> individualCollection = DataParser.getIndividualCollection(document, genoMapMap, parserOptions);
         Collection<Family> familyCollection = DataParser.getFamilyCollection(document, genoMapMap, individualCollection);
 
-        Map<String, Collection<Individual>> individualMap = new HashMap<>();
+        Map<GenoMap, Collection<Individual>> individualMap = new HashMap<>();
 
         for (GenoMap genoMap : genoMapMap.values()) {
-            individualMap.put(genoMap.getTitle(), new HashSet<>());
+            individualMap.put(genoMap, new HashSet<>());
         }
 
         for (Individual individual : individualCollection) {
-            individualMap.get(individual.getGenoMap().getTitle()).add(individual);
+            individualMap.get(individual.getGenoMap()).add(individual);
         }
 
-        Map<String, Collection<Family>> familyMap = new HashMap<>();
+        Map<GenoMap, Collection<Family>> familyMap = new HashMap<>();
 
         for (GenoMap genoMap : genoMapMap.values()) {
-            familyMap.put(genoMap.getTitle(), new HashSet<>());
+            familyMap.put(genoMap, new HashSet<>());
         }
 
         for (Family family : familyCollection) {
-            familyMap.get(family.getGenoMap().getTitle()).add(family);
+            familyMap.get(family.getGenoMap()).add(family);
         }
 
         for (GenoMap genoMap : genoMapMap.values()) {
-            String genoMapTitle = genoMap.getTitle();
-            if (genoMapTitle != null) {
-                genoMapDataList.add(new GenoMapData(genoMap, individualMap.get(genoMapTitle), familyMap.get(genoMapTitle), null));
+            if (!(genoMap.getTitle() == null && parserOptions.isExcludeUntitledGenoMaps())) {
+                genoMapDataList.add(new GenoMapData(genoMap, individualMap.get(genoMap), familyMap.get(genoMap), null));
             }
         }
 
@@ -189,6 +189,7 @@ public class DataUtil {
 
     /**
      * Returns the formatted date
+     *
      * @param date date
      * @param dateFormatter date formatter
      * @return the formatted date

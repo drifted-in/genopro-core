@@ -16,6 +16,7 @@
 package in.drifted.tools.genopro.model;
 
 import java.text.Normalizer;
+import java.util.Objects;
 
 public class GenoMap {
 
@@ -29,6 +30,31 @@ public class GenoMap {
         this.name = name;
         this.title = title;
         this.boundaryRect = boundaryRect;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.id);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+
+        if (this == object) {
+            return true;
+        }
+
+        if (object == null) {
+            return false;
+        }
+
+        if (getClass() != object.getClass()) {
+            return false;
+        }
+
+        final GenoMap other = (GenoMap) object;
+
+        return Objects.equals(this.id, other.id);
     }
 
     private static String getId(String title) {
