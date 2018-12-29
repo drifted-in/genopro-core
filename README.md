@@ -15,33 +15,6 @@ This library covers just a limited subset of GNO file format capabilities. Curre
 - basic individual details
 - basic family relation details
 
-## Parsing options
-
-There are several parser options available for specific needs:
-
-- `excludeUntitledGenoMaps` - use `true` to exclude GenoMaps without a title (the GenoMap title is not the name, it can be specified in GenoMap properties, by default it is empty). This is handy when some stuff needs to be hidden in your report. It can be moved to dedicated GenoMaps which titles are left empty.
-- `excludeUnknownIndividuals` - use `true` to parse details about individuals without name.
-- `resolveHyperlinks` - use `true` to retrieve hyperlink details (if there are multiple instances of the specific individual on multiple hyperlinked GenoMaps and there is a need to work with this data). If the hyperlink points to untitled GenoMap and excludeUntitledGenoMaps is set to true, the hyperlink is ignored.
-- `anonymizedSinceDate` - use specific date, current date or NULL to select the desired anonymization mode, see the Anonymization section.
-
-## Anonymization
-
-In common use cases original data needs to be anonymized. While it can be done after retrieving all data, basic anonymization is available out-of-the-box.
-
-Currently 2 anonymization modes are available. The mode is chosen according to the value of passed date parameter. If date is NULL or future date, the anonymization is disabled completely.
-
-### Suppressing uncertain data
-
-If specific date is provided:
-
-- Individuals are kept if deceased or born before specified date (only if birth date is known).
-- Parents relations are kept if none of parents is anonymized.
-- Children relations are kept if none of children is anonymized.
-
-### Suppressing date values of living individuals
-
-If the current date is provided, all individuals and families are kept, but date values are cleared for all living individuals.
-
 ## List of reports based on this library
 
 - [WebApp exporter](https://github.com/drifted-in/genopro-webapp-exporter)
