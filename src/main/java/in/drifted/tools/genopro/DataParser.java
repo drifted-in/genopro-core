@@ -262,9 +262,10 @@ public class DataParser {
         Collection<Family> familyCollection = new HashSet<>();
 
         Map<String, Integer> relationTypeMap = new HashMap<>();
-        relationTypeMap.put("Marriage", 0);
-        relationTypeMap.put("Divorce", 1);
-        relationTypeMap.put("Separation", 2);
+        relationTypeMap.put("Unspecified", 0);
+        relationTypeMap.put("Marriage", 1);
+        relationTypeMap.put("Divorce", 2);
+        relationTypeMap.put("Separation", 3);
 
         Map<String, Individual> individualMap = new HashMap<>();
 
@@ -352,10 +353,7 @@ public class DataParser {
 
                 int relationType = 0;
 
-                if (relation != null) {
-                    if (!relationTypeMap.containsKey(relation)) {
-                        System.out.println("unkn: " + relation);
-                    }
+                if (relation != null && relationTypeMap.containsKey(relation)) {
                     relationType = relationTypeMap.get(relation);
                 }
 
