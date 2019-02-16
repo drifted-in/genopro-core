@@ -125,10 +125,13 @@ public class DataParser {
 
             if (!name.isEmpty()) {
 
-                BoundaryRect boundaryRect = getBoundaryRect(element.getAttribute("BoundaryRect"));
-                Map<String, String> nodeValueMap = getNodeValueMap(element);
+                String boundaryRect = element.getAttribute("BoundaryRect");
 
-                genoMapMap.put(name, new GenoMap(name, nodeValueMap.get("Title"), boundaryRect));
+                if (!boundaryRect.isEmpty()) {
+                    Map<String, String> nodeValueMap = getNodeValueMap(element);
+
+                    genoMapMap.put(name, new GenoMap(name, nodeValueMap.get("Title"), getBoundaryRect(boundaryRect)));
+                }
             }
         }
 
