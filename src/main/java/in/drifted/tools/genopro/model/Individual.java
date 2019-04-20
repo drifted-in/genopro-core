@@ -30,8 +30,12 @@ public class Individual implements Comparable<Individual> {
     private final boolean anonymized;
     private final Position position;
     private final BoundaryRect boundaryRect;
+    private final String highlightKey;
 
-    public Individual(String id, GenoMap genoMap, Hyperlink hyperlink, Name name, int gender, Birth birth, Death death, boolean dead, boolean anonymized, Position position, BoundaryRect boundaryRect) {
+    public Individual(String id, GenoMap genoMap, Hyperlink hyperlink, Name name, int gender,
+            Birth birth, Death death, boolean dead, boolean anonymized, Position position,
+            BoundaryRect boundaryRect, String highlightKey) {
+
         this.id = id;
         this.genoMap = genoMap;
         this.hyperlink = hyperlink;
@@ -43,6 +47,7 @@ public class Individual implements Comparable<Individual> {
         this.anonymized = anonymized;
         this.position = position;
         this.boundaryRect = boundaryRect;
+        this.highlightKey = highlightKey;
     }
 
     @Override
@@ -114,6 +119,10 @@ public class Individual implements Comparable<Individual> {
 
     public BoundaryRect getBoundaryRect() {
         return boundaryRect;
+    }
+
+    public String getHighlightKey() {
+        return highlightKey;
     }
 
 }

@@ -51,17 +51,18 @@ public class DataUtil {
         List<GenoMapData> genoMapDataList = new ArrayList<>();
 
         Map<String, GenoMap> genoMapMap = DataParser.getGenoMapMap(document);
-        Collection<Individual> individualCollection = DataParser.getIndividualCollection(document, genoMapMap, parserOptions);
-        Collection<Family> familyCollection = DataParser.getFamilyCollection(document, genoMapMap, individualCollection);
+        Map<String, Individual> individualMap = DataParser.getIndividualMap(document, genoMapMap, parserOptions);
+        Map<String, List<PedigreeLink>> familyPedigreeLinkMap = DataParser.getFamilyPedigreeLinkMap(document, individualMap);
+        Collection<Family> familyCollection = DataParser.getFamilyCollection(document, genoMapMap, individualMap, familyPedigreeLinkMap);
 
-        Map<GenoMap, Collection<Individual>> individualMap = new HashMap<>();
+        Map<GenoMap, Collection<Individual>> genoMapIndividualMap = new HashMap<>();
 
         for (GenoMap genoMap : genoMapMap.values()) {
-            individualMap.put(genoMap, new HashSet<>());
+            genoMapIndividualMap.put(genoMap, new HashSet<>());
         }
 
-        for (Individual individual : individualCollection) {
-            individualMap.get(individual.getGenoMap()).add(individual);
+        for (Individual individual : individualMap.values()) {
+            genoMapIndividualMap.get(individual.getGenoMap()).add(individual);
         }
 
         Map<GenoMap, Collection<Family>> familyMap = new HashMap<>();
@@ -76,7 +77,7 @@ public class DataUtil {
 
         for (GenoMap genoMap : genoMapMap.values()) {
             if (!(genoMap.getTitle() == null && parserOptions.isExcludeUntitledGenoMaps())) {
-                genoMapDataList.add(new GenoMapData(genoMap, individualMap.get(genoMap), familyMap.get(genoMap), null));
+                genoMapDataList.add(new GenoMapData(genoMap, genoMapIndividualMap.get(genoMap), familyMap.get(genoMap), null));
             }
         }
 
