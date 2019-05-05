@@ -39,8 +39,8 @@ import org.w3c.dom.Document;
 public class DataUtil {
 
     /**
-     * Returns the collection of data for each GenoMap. This result can be
-     * pre-filtered if specific parser options are enabled.
+     * Returns the collection of data for each GenoMap. This result can be pre-filtered if specific parser options are
+     * enabled.
      *
      * @param document GenoPro XML document
      * @param parserOptions parser options
@@ -52,8 +52,15 @@ public class DataUtil {
 
         Map<String, GenoMap> genoMapMap = DataParser.getGenoMapMap(document);
         Map<String, Individual> individualMap = DataParser.getIndividualMap(document, genoMapMap, parserOptions);
-        Map<String, List<PedigreeLink>> familyPedigreeLinkMap = DataParser.getFamilyPedigreeLinkMap(document, individualMap);
-        Collection<Family> familyCollection = DataParser.getFamilyCollection(document, genoMapMap, individualMap, familyPedigreeLinkMap);
+        Map<String, List<PedigreeLink>> familyPedigreeLinkMap
+                = DataParser.getFamilyPedigreeLinkMap(document, individualMap);
+        Collection<Family> familyCollection = DataParser.getFamilyCollection(document, genoMapMap, individualMap,
+                familyPedigreeLinkMap);
+
+        if (parserOptions.getHighlightMode() > 0) {
+            individualMap = HighlightUtil.getEnhancedIndividualMap(parserOptions.getHighlightMode(), individualMap,
+                    familyPedigreeLinkMap);
+        }
 
         Map<GenoMap, Collection<Individual>> genoMapIndividualMap = new HashMap<>();
 
@@ -77,7 +84,8 @@ public class DataUtil {
 
         for (GenoMap genoMap : genoMapMap.values()) {
             if (!(genoMap.getTitle() == null && parserOptions.isExcludeUntitledGenoMaps())) {
-                genoMapDataList.add(new GenoMapData(genoMap, genoMapIndividualMap.get(genoMap), familyMap.get(genoMap), null));
+                genoMapDataList.add(new GenoMapData(genoMap, genoMapIndividualMap.get(genoMap),
+                        familyMap.get(genoMap), null));
             }
         }
 
@@ -88,11 +96,12 @@ public class DataUtil {
      * Returns the map of family relations for all individuals.
      *
      * @param genoMapDataList collection of data for each GenoMap
-     * @param individualMap map of all individuals used for determining
-     * father/mother relation based on horizontal position
+     * @param individualMap map of all individuals used for determining father/mother relation based on horizontal
+     * position
      * @return the map of family relations for all individuals
      */
-    public static Map<String, FamilyRelation> getFamilyRelationMap(List<GenoMapData> genoMapDataList, Map<String, Individual> individualMap) {
+    public static Map<String, FamilyRelation> getFamilyRelationMap(List<GenoMapData> genoMapDataList,
+            Map<String, Individual> individualMap) {
 
         Map<String, FamilyRelation> familyRelationMap = new HashMap<>();
 
@@ -182,7 +191,8 @@ public class DataUtil {
                 }
             }
 
-            familyRelationMap.put(individualId, new FamilyRelation(fatherMap.get(individualId), motherMap.get(individualId), mateIdList));
+            familyRelationMap.put(individualId, new FamilyRelation(fatherMap.get(individualId),
+                    motherMap.get(individualId), mateIdList));
         }
 
         return familyRelationMap;

@@ -65,7 +65,8 @@ public class GenoMap {
 
             StringBuilder idBuilder = new StringBuilder();
 
-            String normalizedTitle = Normalizer.normalize(title, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+            String normalizedTitle = Normalizer.normalize(title, Normalizer.Form.NFD)
+                    .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
 
             for (char c : normalizedTitle.toLowerCase().toCharArray()) {
 

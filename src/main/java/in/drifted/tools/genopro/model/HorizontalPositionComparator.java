@@ -27,7 +27,9 @@ public class HorizontalPositionComparator implements Comparator<Individual> {
 
     @Override
     public int compare(Individual o1, Individual o2) {
-        int result = Integer.compare(o1.getBoundaryRect().getTopLeft().getX(), o2.getBoundaryRect().getTopLeft().getX());
+        int result = Integer.compare(o1.getBoundaryRect().getTopLeft().getX(),
+                o2.getBoundaryRect().getTopLeft().getX());
+
         return ascending ? result : -result;
     }
 }

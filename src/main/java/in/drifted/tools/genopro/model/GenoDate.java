@@ -23,7 +23,8 @@ import java.util.Map;
 
 public class GenoDate {
 
-    private static final DateTimeFormatter DATE_IN_FORMATTER = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter DATE_IN_FORMATTER
+            = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);
 
     private final String prefix;
     private final LocalDate localDate;

@@ -24,7 +24,9 @@ public class GenoMapData {
     private final Collection<Family> familyCollection;
     private final Collection<Label> labelCollection;
 
-    public GenoMapData(GenoMap genoMap, Collection<Individual> individualCollection, Collection<Family> familyCollection, Collection<Label> labelCollection) {
+    public GenoMapData(GenoMap genoMap, Collection<Individual> individualCollection,
+            Collection<Family> familyCollection, Collection<Label> labelCollection) {
+
         this.genoMap = genoMap;
         this.individualCollection = individualCollection;
         this.familyCollection = familyCollection;
