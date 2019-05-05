@@ -42,6 +42,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.zip.ZipInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -146,7 +147,8 @@ public class DataParser {
      * @param parserOptions parser options
      * @return the map of all individuals
      */
-    public static Map<String, Individual> getIndividualMap(Document document, Map<String, GenoMap> genoMapMap, ParserOptions parserOptions) {
+    public static Map<String, Individual> getIndividualMap(Document document, Map<String, GenoMap> genoMapMap,
+            ParserOptions parserOptions) {
 
         Map<String, Individual> individualMap = new HashMap<>();
 
@@ -167,7 +169,8 @@ public class DataParser {
      * @param parserOptions parser options
      * @return the collection of all individuals
      */
-    public static Collection<Individual> getIndividualCollection(Document document, Map<String, GenoMap> genoMapMap, ParserOptions parserOptions) {
+    public static Collection<Individual> getIndividualCollection(Document document, Map<String, GenoMap> genoMapMap,
+            ParserOptions parserOptions) {
 
         Collection<Individual> individualCollection = new HashSet<>();
 
@@ -193,7 +196,8 @@ public class DataParser {
         return individualCollection;
     }
 
-    private static Collection<Individual> getResolvedIndividualCollection(Collection<Individual> individualCollection, ParserOptions parserOptions) {
+    private static Collection<Individual> getResolvedIndividualCollection(Collection<Individual> individualCollection,
+            ParserOptions parserOptions) {
 
         Collection<Individual> resolvedIndividualCollection = new HashSet<>();
 
@@ -231,13 +235,13 @@ public class DataParser {
                     resolvedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(),
                             hyperlink, individual.getName(), individual.getGender(), individual.getBirth(),
                             individual.getDeath(), individual.isDead(), false, individual.getPosition(),
-                            individual.getBoundaryRect(), individual.getHighlightKey()));
+                            individual.getBoundaryRect(), individual.getHighlightKeySet()));
 
                 } else {
                     resolvedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(),
-                            hyperlink, targetIndividual.getName(), targetIndividual.getGender(), targetIndividual.getBirth(),
-                            targetIndividual.getDeath(), targetIndividual.isDead(), false, individual.getPosition(),
-                            individual.getBoundaryRect(), individual.getHighlightKey()));
+                            hyperlink, targetIndividual.getName(), targetIndividual.getGender(),
+                            targetIndividual.getBirth(), targetIndividual.getDeath(), targetIndividual.isDead(), false,
+                            individual.getPosition(), individual.getBoundaryRect(), individual.getHighlightKeySet()));
                 }
 
             } else {
@@ -248,7 +252,8 @@ public class DataParser {
         return resolvedIndividualCollection;
     }
 
-    private static Collection<Individual> getAnonymizedIndividualCollection(Collection<Individual> individualCollection, ParserOptions parserOptions) {
+    private static Collection<Individual> getAnonymizedIndividualCollection(Collection<Individual> individualCollection,
+            ParserOptions parserOptions) {
 
         Collection<Individual> anonymizedIndividualCollection = new HashSet<>();
 
@@ -268,13 +273,14 @@ public class DataParser {
             } else {
                 if (anonymizeDatesOnly) {
                     anonymizedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(),
-                            individual.getHyperlink(), individual.getName(), individual.getGender(), null, null, false, false,
-                            individual.getPosition(), individual.getBoundaryRect(), individual.getHighlightKey()));
+                            individual.getHyperlink(), individual.getName(), individual.getGender(), null, null, false,
+                            false, individual.getPosition(), individual.getBoundaryRect(),
+                            individual.getHighlightKeySet()));
 
                 } else {
                     anonymizedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(),
                             null, null, individual.getGender(), null, null, false, true, individual.getPosition(),
-                            individual.getBoundaryRect(), individual.getHighlightKey()));
+                            individual.getBoundaryRect(), individual.getHighlightKeySet()));
                 }
             }
         }
@@ -330,6 +336,24 @@ public class DataParser {
             String familyId = familyElement.getAttribute("ID");
 
             List<PedigreeLink> pedigreeLinkList = familyPedigreeLinkMap.get(familyId);
+
+            String fatherId = null;
+            String motherId = null;
+
+            for (PedigreeLink pedigreeLink : pedigreeLinkList) {
+
+                if (pedigreeLink.getType() == PedigreeLink.PARENT) {
+
+                    Individual individual = individualMap.get(pedigreeLink.getIndividualId());
+
+                    if (individual.getGender() == Gender.MALE) {
+                        fatherId = individual.getId();
+
+                    } else if (individual.getGender() == Gender.FEMALE) {
+                        motherId = individual.getId();
+                    }
+                }
+            }
 
             boolean isParentAnonymized = false;
 
@@ -404,7 +428,8 @@ public class DataParser {
                 Node bottomNode = getSingleNode(positionElement, "Bottom");
                 if (bottomNode != null) {
                     Map<String, String> bottomNodeValueMap = getNodeValueMap(bottomNode);
-                    bottomBoundaryRect = getBoundaryRect(bottomNodeValueMap.get("Left") + "," + bottomNodeValueMap.get("Right"));
+                    bottomBoundaryRect = getBoundaryRect(bottomNodeValueMap.get("Left") + ","
+                            + bottomNodeValueMap.get("Right"));
                 }
 
                 GenoMap genoMap = genoMapMap.get(genoMapName);
@@ -413,8 +438,8 @@ public class DataParser {
                     genoMap = genoMapMap.values().iterator().next();
                 }
 
-                familyCollection.add(new Family(familyId, genoMap, label, relationType, date, comment, pedigreeLinkList,
-                        position, topBoundaryRect, bottomBoundaryRect));
+                familyCollection.add(new Family(familyId, fatherId, motherId, genoMap, label, relationType, date,
+                        comment, pedigreeLinkList, position, topBoundaryRect, bottomBoundaryRect));
             }
         }
 
@@ -428,7 +453,8 @@ public class DataParser {
      * @param individualMap map of all individuals
      * @return a¨the map of family pedigree links for all families
      */
-    public static Map<String, List<PedigreeLink>> getFamilyPedigreeLinkMap(Document document, Map<String, Individual> individualMap) {
+    public static Map<String, List<PedigreeLink>> getFamilyPedigreeLinkMap(Document document,
+            Map<String, Individual> individualMap) {
 
         Map<String, List<PedigreeLink>> familyPedigreeLinkMap = new HashMap<>();
 
@@ -534,10 +560,10 @@ public class DataParser {
             genoMap = genoMapMap.values().iterator().next();
         }
 
-        String highlightKey = getHighlightKey(individualElement);
+        Set<String> highlightKeySet = getHighlightKeySet(individualElement);
 
         return new Individual(id, genoMap, hyperlink.isEmpty() ? null : new Hyperlink(null, hyperlink), name, gender,
-                birth, death, isDead, false, position, boundaryRect, highlightKey);
+                birth, death, isDead, false, position, boundaryRect, highlightKeySet);
     }
 
     private static Name getName(Element individual) {
@@ -625,9 +651,9 @@ public class DataParser {
         return new BoundaryRect(values[0], values[1], values[2], values[3]);
     }
 
-    private static String getHighlightKey(Element individualElement) {
+    private static Set<String> getHighlightKeySet(Element individualElement) {
 
-        String highlightKey = null;
+        Set<String> highlightKeySet = new HashSet<>();
 
         NodeList displayNodeList = individualElement.getElementsByTagName("Display");
 
@@ -637,16 +663,16 @@ public class DataParser {
             if (colorsNode != null) {
                 Node genderNode = getSingleNode((Element) colorsNode, "Gender");
                 if (genderNode != null) {
-                    highlightKey = ((Element) genderNode).getAttribute("Symbol");
-                    if (highlightKey.isEmpty()) {
-                        highlightKey = null;
+                    String highlightKey = ((Element) genderNode).getAttribute("Symbol");
+                    if (!highlightKey.isEmpty()) {
+                        highlightKeySet.add(highlightKey);
                     }
                     break;
                 }
             }
         }
 
-        return highlightKey;
+        return highlightKeySet;
     }
 
     private static Node getSingleNode(Element element, String name) {

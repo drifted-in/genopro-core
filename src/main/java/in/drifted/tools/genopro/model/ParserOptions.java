@@ -23,6 +23,7 @@ public class ParserOptions {
     private boolean excludeUnknownIndividuals = false;
     private boolean resolveHyperlinks = false;
     private LocalDate anonymizedSinceDate = null;
+    private int highlightMode = 0;
 
     public boolean isExcludeUntitledGenoMaps() {
         return excludeUntitledGenoMaps;
@@ -54,6 +55,14 @@ public class ParserOptions {
 
     public void setAnonymizedSinceDate(LocalDate anonymizedSinceDate) {
         this.anonymizedSinceDate = anonymizedSinceDate;
+    }
+
+    public int getHighlightMode() {
+        return highlightMode;
+    }
+
+    public void setHighlightMode(int highlightMode) {
+        this.highlightMode = highlightMode;
     }
 
 }

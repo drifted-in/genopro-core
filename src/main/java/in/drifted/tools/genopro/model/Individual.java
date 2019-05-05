@@ -16,6 +16,7 @@
 package in.drifted.tools.genopro.model;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 public class Individual implements Comparable<Individual> {
 
@@ -30,11 +31,11 @@ public class Individual implements Comparable<Individual> {
     private final boolean anonymized;
     private final Position position;
     private final BoundaryRect boundaryRect;
-    private final String highlightKey;
+    private final Set<String> highlightKeySet;
 
     public Individual(String id, GenoMap genoMap, Hyperlink hyperlink, Name name, int gender,
             Birth birth, Death death, boolean dead, boolean anonymized, Position position,
-            BoundaryRect boundaryRect, String highlightKey) {
+            BoundaryRect boundaryRect, Set<String> highlightKeySet) {
 
         this.id = id;
         this.genoMap = genoMap;
@@ -47,14 +48,15 @@ public class Individual implements Comparable<Individual> {
         this.anonymized = anonymized;
         this.position = position;
         this.boundaryRect = boundaryRect;
-        this.highlightKey = highlightKey;
+        this.highlightKeySet = highlightKeySet;
     }
 
     @Override
     public int compareTo(Individual individual) {
 
         LocalDate birthDate01 = (birth != null && birth.hasDate()) ? birth.getDate().getLocalDate() : LocalDate.MAX;
-        LocalDate birthDate02 = (individual.getBirth() != null && individual.getBirth().hasDate()) ? individual.getBirth().getDate().getLocalDate() : LocalDate.MAX;
+        LocalDate birthDate02 = (individual.getBirth() != null && individual.getBirth().hasDate()) ?
+                individual.getBirth().getDate().getLocalDate() : LocalDate.MAX;
 
         int result = birthDate01.compareTo(birthDate02);
 
@@ -121,8 +123,8 @@ public class Individual implements Comparable<Individual> {
         return boundaryRect;
     }
 
-    public String getHighlightKey() {
-        return highlightKey;
+    public Set<String> getHighlightKeySet() {
+        return highlightKeySet;
     }
 
 }
