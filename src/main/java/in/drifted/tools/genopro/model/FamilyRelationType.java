@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Jan Tošovský <jan.tosovsky.cz@gmail.com>
+ * Copyright (c) 2019 Jan Tošovský <jan.tosovsky.cz@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,27 @@
  */
 package in.drifted.tools.genopro.model;
 
-public enum Gender {
-    UNKNOWN,
-    MALE,
-    FEMALE;
+public enum FamilyRelationType {
+    UNSPECIFIED,
+    MARRIAGE,
+    DIVORCE,
+    SEPARATION;
 
-    public static Gender parse(String gender) {
+    public static FamilyRelationType parse(String familyRelationType) {
 
-        if (gender == null) {
-            return UNKNOWN;
+        if (familyRelationType == null) {
+            return UNSPECIFIED;
 
         } else {
-            switch (gender) {
-                case "M":
-                    return MALE;
-                case "F":
-                    return FEMALE;
+            switch (familyRelationType) {
+                case "Marriage":
+                    return MARRIAGE;
+                case "Divorce":
+                    return DIVORCE;
+                case "Separation":
+                    return SEPARATION;
                 default:
-                    return UNKNOWN;
+                    return UNSPECIFIED;
             }
         }
     }

@@ -24,7 +24,8 @@ public class Family {
     private final String motherId;
     private final GenoMap genoMap;
     private final String label;
-    private final int type;
+    private final FamilyRelationType familyRelationType;
+    private final FamilyLineType familyLineType;
     private final GenoDate date;
     private final String comment;
     private final List<PedigreeLink> pedigreeLinkList;
@@ -32,16 +33,18 @@ public class Family {
     private final BoundaryRect topBoundaryRect;
     private final BoundaryRect bottomBoundaryRect;
 
-    public Family(String id, String fatherId, String motherId, GenoMap genoMap, String label, int type, GenoDate date,
-            String comment, List<PedigreeLink> pedigreeLinkList, Position position,
-            BoundaryRect topBoundaryRect, BoundaryRect bottomBoundaryRect) {
+    public Family(String id, String fatherId, String motherId, GenoMap genoMap, String label,
+            FamilyRelationType familyRelationType, FamilyLineType familyLineType, GenoDate date, String comment,
+            List<PedigreeLink> pedigreeLinkList, Position position, BoundaryRect topBoundaryRect,
+            BoundaryRect bottomBoundaryRect) {
 
         this.id = id;
         this.fatherId = fatherId;
         this.motherId = motherId;
         this.genoMap = genoMap;
         this.label = label;
-        this.type = type;
+        this.familyRelationType = familyRelationType;
+        this.familyLineType = familyLineType;
         this.date = date;
         this.comment = comment;
         this.pedigreeLinkList = pedigreeLinkList;
@@ -70,8 +73,12 @@ public class Family {
         return label;
     }
 
-    public int getType() {
-        return type;
+    public FamilyRelationType getFamilyRelationType() {
+        return familyRelationType;
+    }
+
+    public FamilyLineType getFamilyLineType() {
+        return familyLineType;
     }
 
     public GenoDate getDate() {

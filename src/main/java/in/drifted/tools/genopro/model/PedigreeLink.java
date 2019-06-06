@@ -17,44 +17,24 @@ package in.drifted.tools.genopro.model;
 
 public class PedigreeLink {
 
-    public static final int PARENT = 0;
-    public static final int BIOLOGICAL = 1;
-    public static final int ADOPTED = 2;
-
     private final String individualId;
-    private final int type;
+    private final PedigreeLinkType pedigreeLinkType;
     private final Position position;
     private final Position twinPosition;
 
-    public PedigreeLink(String individualId, String type, Position position, Position twinPosition) {
+    public PedigreeLink(String individualId, PedigreeLinkType pedigreeLinkType, Position position, Position twinPosition) {
         this.individualId = individualId;
-        this.type = getType(type);
+        this.pedigreeLinkType = pedigreeLinkType;
         this.position = position;
         this.twinPosition = twinPosition;
-    }
-
-    public PedigreeLink(String individualId, int type, Position position, Position twinPosition) {
-        this.individualId = individualId;
-        this.type = type;
-        this.position = position;
-        this.twinPosition = twinPosition;
-    }
-
-    private int getType(String value) {
-
-        switch (value) {
-            case "Parent" : return PARENT;
-            case "Adopted" : return ADOPTED;
-            default: return BIOLOGICAL;
-        }
     }
 
     public String getIndividualId() {
         return individualId;
     }
 
-    public int getType() {
-        return type;
+    public PedigreeLinkType getPedigreeLinkType() {
+        return pedigreeLinkType;
     }
 
     public Position getPosition() {
@@ -63,6 +43,10 @@ public class PedigreeLink {
 
     public Position getTwinPosition() {
         return twinPosition;
+    }
+
+    public boolean isParent() {
+        return pedigreeLinkType == PedigreeLinkType.PARENT;
     }
 
 }

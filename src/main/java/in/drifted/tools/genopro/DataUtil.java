@@ -19,7 +19,6 @@ import in.drifted.tools.genopro.model.DateFormatter;
 import in.drifted.tools.genopro.model.EventDate;
 import in.drifted.tools.genopro.model.Family;
 import in.drifted.tools.genopro.model.FamilyRelation;
-import in.drifted.tools.genopro.model.Gender;
 import in.drifted.tools.genopro.model.GenoMap;
 import in.drifted.tools.genopro.model.GenoMapData;
 import in.drifted.tools.genopro.model.HorizontalPositionComparator;
@@ -121,13 +120,13 @@ public class DataUtil {
 
                 for (PedigreeLink pedigreeLink : family.getPedigreeLinkList()) {
 
-                    if (pedigreeLink.getType() == PedigreeLink.PARENT) {
+                    if (pedigreeLink.isParent()) {
 
                         String individualId = pedigreeLink.getIndividualId();
                         Individual individual = individualMap.get(individualId);
 
                         if (individual != null) {
-                            if (individual.getGender() == Gender.MALE) {
+                            if (individual.isMale()) {
                                 father = individual;
                             } else {
                                 mother = individual;
@@ -140,7 +139,7 @@ public class DataUtil {
 
                     String individualId = pedigreeLink.getIndividualId();
 
-                    if (pedigreeLink.getType() == PedigreeLink.PARENT) {
+                    if (pedigreeLink.isParent()) {
 
                         if (father != null && father.getId().equals(individualId)) {
                             if (!mateMap.containsKey(individualId)) {
@@ -184,7 +183,7 @@ public class DataUtil {
             if (mateMap.containsKey(individualId)) {
 
                 List<Individual> mateList = mateMap.get(individualId);
-                Collections.sort(mateList, (individual.getGender() == Gender.MALE) ? maleComparator : femaleComparator);
+                Collections.sort(mateList, individual.isMale() ? maleComparator : femaleComparator);
 
                 for (Individual mate : mateList) {
                     mateIdList.add(mate.getId());

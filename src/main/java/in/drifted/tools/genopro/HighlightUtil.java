@@ -74,7 +74,7 @@ public class HighlightUtil {
         Map<String, Set<String>> deducedHighlightKeyMap = new HashMap<>();
         Map<String, Map<String, Set<String>>> childMap = new HashMap<>();
 
-        int gender = (highlightMode == 2) ? Gender.FEMALE : Gender.MALE;
+        Gender gender = (highlightMode == 2) ? Gender.FEMALE : Gender.MALE;
 
         for (List<PedigreeLink> pedigreeLinkList : familyPedigreeLinkMap.values()) {
 
@@ -85,7 +85,7 @@ public class HighlightUtil {
             // assing child info to the parent
             for (PedigreeLink pedigreeLink : pedigreeLinkList) {
 
-                if (pedigreeLink.getType() == PedigreeLink.PARENT) {
+                if (pedigreeLink.isParent()) {
 
                     Individual individual = individualMap.get(pedigreeLink.getIndividualId());
 
@@ -108,7 +108,7 @@ public class HighlightUtil {
             // fill-in child info
             for (PedigreeLink pedigreeLink : pedigreeLinkList) {
 
-                if (pedigreeLink.getType() != PedigreeLink.PARENT) {
+                if (!pedigreeLink.isParent()) {
                     String childId = pedigreeLink.getIndividualId();
                     Individual individual = individualMap.get(childId);
                     if (individual.getGender() == gender) {

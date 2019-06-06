@@ -20,6 +20,7 @@ import in.drifted.tools.genopro.model.BoundaryRect;
 import in.drifted.tools.genopro.model.Death;
 import in.drifted.tools.genopro.model.DocumentInfo;
 import in.drifted.tools.genopro.model.Family;
+import in.drifted.tools.genopro.model.FamilyLineType;
 import in.drifted.tools.genopro.model.Gender;
 import in.drifted.tools.genopro.model.GenoDate;
 import in.drifted.tools.genopro.model.GenoMap;
@@ -30,6 +31,8 @@ import in.drifted.tools.genopro.model.Name;
 import in.drifted.tools.genopro.model.ParserOptions;
 import in.drifted.tools.genopro.model.PedigreeLink;
 import in.drifted.tools.genopro.model.Position;
+import in.drifted.tools.genopro.model.FamilyRelationType;
+import in.drifted.tools.genopro.model.PedigreeLinkType;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -302,12 +305,6 @@ public class DataParser {
 
         Collection<Family> familyCollection = new HashSet<>();
 
-        Map<String, Integer> relationTypeMap = new HashMap<>();
-        relationTypeMap.put("Unspecified", 0);
-        relationTypeMap.put("Marriage", 1);
-        relationTypeMap.put("Divorce", 2);
-        relationTypeMap.put("Separation", 3);
-
         Map<String, Marriage> marriageMap = getMarriageMap(document);
 
         NodeList nodeList = document.getElementsByTagName("Family");
@@ -342,14 +339,14 @@ public class DataParser {
 
             for (PedigreeLink pedigreeLink : pedigreeLinkList) {
 
-                if (pedigreeLink.getType() == PedigreeLink.PARENT) {
+                if (pedigreeLink.isParent()) {
 
                     Individual individual = individualMap.get(pedigreeLink.getIndividualId());
 
-                    if (individual.getGender() == Gender.MALE) {
+                    if (individual.isMale()) {
                         fatherId = individual.getId();
 
-                    } else if (individual.getGender() == Gender.FEMALE) {
+                    } else if (individual.isFemale()) {
                         motherId = individual.getId();
                     }
                 }
@@ -359,7 +356,7 @@ public class DataParser {
 
             for (PedigreeLink pedigreeLink : pedigreeLinkList) {
 
-                if (pedigreeLink.getType() == PedigreeLink.PARENT) {
+                if (pedigreeLink.isParent()) {
 
                     Individual individual = individualMap.get(pedigreeLink.getIndividualId());
 
@@ -373,7 +370,7 @@ public class DataParser {
             boolean isChildAnonymized = false;
 
             for (PedigreeLink pedigreeLink : pedigreeLinkList) {
-                if (pedigreeLink.getType() != PedigreeLink.PARENT) {
+                if (!pedigreeLink.isParent()) {
                     if (individualMap.get(pedigreeLink.getIndividualId()).isAnonymized()) {
                         isChildAnonymized = true;
                         break;
@@ -384,7 +381,7 @@ public class DataParser {
             boolean hasChildren = false;
 
             for (PedigreeLink pedigreeLink : pedigreeLinkList) {
-                if (pedigreeLink.getType() != PedigreeLink.PARENT) {
+                if (!pedigreeLink.isParent()) {
                     hasChildren = true;
                     break;
                 }
@@ -394,7 +391,7 @@ public class DataParser {
 
             if (!isParentAnonymized && hasChildren && isChildAnonymized) {
                 for (PedigreeLink pedigreeLink : pedigreeLinkList) {
-                    if (pedigreeLink.getType() == PedigreeLink.PARENT) {
+                    if (pedigreeLink.isParent()) {
                         childlessPedigreeLinkList.add(pedigreeLink);
                     }
                 }
@@ -405,14 +402,8 @@ public class DataParser {
             if (!(isParentAnonymized && !hasChildren) && !(isParentAnonymized && hasChildren && isChildAnonymized)) {
 
                 String label = familyNodeValueMap.get("DisplayText");
-                String relation = familyNodeValueMap.get("Relation");
-
-                int relationType = 0;
-
-                if (relation != null && relationTypeMap.containsKey(relation)) {
-                    relationType = relationTypeMap.get(relation);
-                }
-
+                FamilyLineType familyLineType = FamilyLineType.parse(familyNodeValueMap.get("FamilyLine"));
+                FamilyRelationType relationType = FamilyRelationType.parse(familyNodeValueMap.get("Relation"));
                 Element positionElement = (Element) getSingleNode(familyElement, "Position");
                 String genoMapName = positionElement.getAttribute("GenoMap");
                 Position position = getPosition(positionElement.getFirstChild().getTextContent().trim());
@@ -438,8 +429,9 @@ public class DataParser {
                     genoMap = genoMapMap.values().iterator().next();
                 }
 
-                familyCollection.add(new Family(familyId, fatherId, motherId, genoMap, label, relationType, date,
-                        comment, pedigreeLinkList, position, topBoundaryRect, bottomBoundaryRect));
+                familyCollection.add(new Family(familyId, fatherId, motherId, genoMap, label, relationType,
+                        familyLineType, date, comment, pedigreeLinkList, position, topBoundaryRect,
+                        bottomBoundaryRect));
             }
         }
 
@@ -474,7 +466,7 @@ public class DataParser {
 
             String familyId = pedigreeLinkElement.getAttribute("Family");
             String individualId = pedigreeLinkElement.getAttribute("Individual");
-            String linkType = pedigreeLinkElement.getAttribute("PedigreeLink");
+            PedigreeLinkType pedigreeLinkType = PedigreeLinkType.parse(pedigreeLinkElement.getAttribute("PedigreeLink"));
             Position position = individualPositionMap.get(individualId);
             String twin = pedigreeLinkElement.getAttribute("Twin");
             Position twinPosition = twin.isEmpty() ? null : twinPositionMap.get(twin);
@@ -483,7 +475,7 @@ public class DataParser {
                 familyPedigreeLinkMap.put(familyId, new ArrayList<>());
             }
 
-            familyPedigreeLinkMap.get(familyId).add(new PedigreeLink(individualId, linkType, position, twinPosition));
+            familyPedigreeLinkMap.get(familyId).add(new PedigreeLink(individualId, pedigreeLinkType, position, twinPosition));
         }
 
         return familyPedigreeLinkMap;
@@ -540,7 +532,7 @@ public class DataParser {
 
         Map<String, String> individualNodeValueMap = getNodeValueMap(individualElement);
 
-        int gender = Gender.getValue(individualNodeValueMap.get("Gender"));
+        Gender gender = Gender.parse(individualNodeValueMap.get("Gender"));
         boolean isDead = false;
 
         String isDeadValue = individualNodeValueMap.get("IsDead");

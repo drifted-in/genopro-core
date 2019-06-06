@@ -24,7 +24,7 @@ public class Individual implements Comparable<Individual> {
     private final GenoMap genoMap;
     private final Hyperlink hyperlink;
     private final Name name;
-    private final int gender;
+    private final Gender gender;
     private final Birth birth;
     private final Death death;
     private final boolean dead;
@@ -33,7 +33,7 @@ public class Individual implements Comparable<Individual> {
     private final BoundaryRect boundaryRect;
     private final Set<String> highlightKeySet;
 
-    public Individual(String id, GenoMap genoMap, Hyperlink hyperlink, Name name, int gender,
+    public Individual(String id, GenoMap genoMap, Hyperlink hyperlink, Name name, Gender gender,
             Birth birth, Death death, boolean dead, boolean anonymized, Position position,
             BoundaryRect boundaryRect, Set<String> highlightKeySet) {
 
@@ -55,8 +55,8 @@ public class Individual implements Comparable<Individual> {
     public int compareTo(Individual individual) {
 
         LocalDate birthDate01 = (birth != null && birth.hasDate()) ? birth.getDate().getLocalDate() : LocalDate.MAX;
-        LocalDate birthDate02 = (individual.getBirth() != null && individual.getBirth().hasDate()) ?
-                individual.getBirth().getDate().getLocalDate() : LocalDate.MAX;
+        LocalDate birthDate02 = (individual.getBirth() != null && individual.getBirth().hasDate())
+                ? individual.getBirth().getDate().getLocalDate() : LocalDate.MAX;
 
         int result = birthDate01.compareTo(birthDate02);
 
@@ -95,7 +95,7 @@ public class Individual implements Comparable<Individual> {
         return name;
     }
 
-    public int getGender() {
+    public Gender getGender() {
         return gender;
     }
 
@@ -125,6 +125,14 @@ public class Individual implements Comparable<Individual> {
 
     public Set<String> getHighlightKeySet() {
         return highlightKeySet;
+    }
+
+    public boolean isMale() {
+        return gender == Gender.MALE;
+    }
+
+    public boolean isFemale() {
+        return gender == Gender.FEMALE;
     }
 
 }
