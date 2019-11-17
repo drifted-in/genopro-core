@@ -17,11 +17,11 @@ package in.drifted.tools.genopro.model;
 
 import java.util.Comparator;
 
-public class HorizontalPositionComparator implements Comparator<Individual> {
+public class IndividualHorizontalPositionComparator implements Comparator<Individual> {
 
     private boolean ascending = true;
 
-    public HorizontalPositionComparator(boolean ascending) {
+    public IndividualHorizontalPositionComparator(boolean ascending) {
         this.ascending = ascending;
     }
 

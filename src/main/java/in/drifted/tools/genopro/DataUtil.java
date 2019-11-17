@@ -21,7 +21,7 @@ import in.drifted.tools.genopro.model.Family;
 import in.drifted.tools.genopro.model.FamilyRelation;
 import in.drifted.tools.genopro.model.GenoMap;
 import in.drifted.tools.genopro.model.GenoMapData;
-import in.drifted.tools.genopro.model.HorizontalPositionComparator;
+import in.drifted.tools.genopro.model.IndividualHorizontalPositionComparator;
 import in.drifted.tools.genopro.model.Individual;
 import in.drifted.tools.genopro.model.ParserOptions;
 import in.drifted.tools.genopro.model.PedigreeLink;
@@ -50,11 +50,12 @@ public class DataUtil {
         List<GenoMapData> genoMapDataList = new ArrayList<>();
 
         Map<String, GenoMap> genoMapMap = DataParser.getGenoMapMap(document);
+        Map<String, String> placeMap = DataParser.getPlaceMap(document);
         Map<String, Individual> individualMap = DataParser.getIndividualMap(document, genoMapMap, parserOptions);
-        Map<String, List<PedigreeLink>> familyPedigreeLinkMap
-                = DataParser.getFamilyPedigreeLinkMap(document, individualMap);
+        Map<String, List<PedigreeLink>> familyPedigreeLinkMap =
+                DataParser.getFamilyPedigreeLinkMap(document, individualMap);
         Collection<Family> familyCollection = DataParser.getFamilyCollection(document, genoMapMap, individualMap,
-                familyPedigreeLinkMap);
+                familyPedigreeLinkMap, placeMap);
 
         if (parserOptions.getHighlightMode() > 0) {
             individualMap = HighlightUtil.getEnhancedIndividualMap(parserOptions.getHighlightMode(), individualMap,
@@ -108,8 +109,8 @@ public class DataUtil {
         Map<String, String> motherMap = new HashMap<>();
         Map<String, List<Individual>> mateMap = new HashMap<>();
 
-        Comparator<Individual> maleComparator = new HorizontalPositionComparator(true);
-        Comparator<Individual> femaleComparator = new HorizontalPositionComparator(false);
+        Comparator<Individual> maleComparator = new IndividualHorizontalPositionComparator(true);
+        Comparator<Individual> femaleComparator = new IndividualHorizontalPositionComparator(false);
 
         for (GenoMapData genoMapData : genoMapDataList) {
 

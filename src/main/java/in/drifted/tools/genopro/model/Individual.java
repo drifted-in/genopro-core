@@ -15,12 +15,12 @@
  */
 package in.drifted.tools.genopro.model;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 public class Individual implements Comparable<Individual> {
 
     private final String id;
+    private final int key;
     private final GenoMap genoMap;
     private final Hyperlink hyperlink;
     private final Name name;
@@ -38,6 +38,7 @@ public class Individual implements Comparable<Individual> {
             BoundaryRect boundaryRect, Set<String> highlightKeySet) {
 
         this.id = id;
+        this.key = Integer.parseInt(id.replace("ind", ""));
         this.genoMap = genoMap;
         this.hyperlink = hyperlink;
         this.name = name;
@@ -53,30 +54,7 @@ public class Individual implements Comparable<Individual> {
 
     @Override
     public int compareTo(Individual individual) {
-
-        LocalDate birthDate01 = (birth != null && birth.hasDate()) ? birth.getDate().getLocalDate() : LocalDate.MAX;
-        LocalDate birthDate02 = (individual.getBirth() != null && individual.getBirth().hasDate())
-                ? individual.getBirth().getDate().getLocalDate() : LocalDate.MAX;
-
-        int result = birthDate01.compareTo(birthDate02);
-
-        if (result == 0) {
-
-            String last01 = (name.getLast() != null) ? name.getLast() : "";
-            String last02 = (individual.getName().getLast() != null) ? individual.getName().getLast() : "";
-
-            result = last01.compareTo(last02);
-        }
-
-        if (result == 0) {
-
-            String first01 = (name.getFirst() != null) ? name.getFirst() : "";
-            String first02 = (individual.getName().getFirst() != null) ? individual.getName().getFirst() : "";
-
-            result = first01.compareTo(first02);
-        }
-
-        return result;
+        return Integer.compare(this.key, individual.key);
     }
 
     public String getId() {
