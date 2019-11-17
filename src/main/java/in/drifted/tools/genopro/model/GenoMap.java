@@ -26,7 +26,7 @@ public class GenoMap {
     private final BoundaryRect boundaryRect;
 
     public GenoMap(String name, String title, BoundaryRect boundaryRect) {
-        this.id = getId(title);
+        this.id = (title != null) ? getId(title) : getId(name);
         this.name = name;
         this.title = title;
         this.boundaryRect = boundaryRect;
