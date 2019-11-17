@@ -26,7 +26,7 @@ import in.drifted.tools.genopro.model.GenoDate;
 import in.drifted.tools.genopro.model.GenoMap;
 import in.drifted.tools.genopro.model.Hyperlink;
 import in.drifted.tools.genopro.model.Individual;
-import in.drifted.tools.genopro.model.Marriage;
+import in.drifted.tools.genopro.model.FamilyEvent;
 import in.drifted.tools.genopro.model.Name;
 import in.drifted.tools.genopro.model.ParserOptions;
 import in.drifted.tools.genopro.model.PedigreeLink;
@@ -298,33 +298,30 @@ public class DataParser {
      * @param genoMapMap map of all GenoMaps
      * @param individualMap map of all individuals
      * @param familyPedigreeLinkMap map of family pedigree links
+     * @param placeMap map of all places
      * @return the collection of all families
      */
     public static Collection<Family> getFamilyCollection(Document document, Map<String, GenoMap> genoMapMap,
-            Map<String, Individual> individualMap, Map<String, List<PedigreeLink>> familyPedigreeLinkMap) {
+            Map<String, Individual> individualMap, Map<String, List<PedigreeLink>> familyPedigreeLinkMap, Map<String, String> placeMap) {
 
         Collection<Family> familyCollection = new HashSet<>();
 
-        Map<String, Marriage> marriageMap = getMarriageMap(document);
+        Map<String, FamilyEvent> marriageMap = getMarriageMap(document, placeMap);
 
         NodeList nodeList = document.getElementsByTagName("Family");
 
         for (int i = 0; i < nodeList.getLength(); i++) {
 
             Element familyElement = (Element) nodeList.item(i);
+
+            List<FamilyEvent> familyEventList = new ArrayList<>();
+
             Node unionsNode = getSingleNode(familyElement, "Unions");
 
-            GenoDate date = null;
-            String comment = null;
-
             if (unionsNode != null) {
-
                 String unions = unionsNode.getTextContent();
-                Marriage marriage = marriageMap.get(unions);
-
-                if (marriage != null) {
-                    date = marriage.getDate();
-                    comment = marriage.getComment();
+                if (marriageMap.containsKey(unions)) {
+                    familyEventList.add(marriageMap.get(unions));
                 }
             }
 
@@ -430,7 +427,7 @@ public class DataParser {
                 }
 
                 familyCollection.add(new Family(familyId, fatherId, motherId, genoMap, label, relationType,
-                        familyLineType, date, comment, pedigreeLinkList, position, topBoundaryRect,
+                        familyLineType, familyEventList, pedigreeLinkList, position, topBoundaryRect,
                         bottomBoundaryRect));
             }
         }
@@ -481,9 +478,9 @@ public class DataParser {
         return familyPedigreeLinkMap;
     }
 
-    private static Map<String, Marriage> getMarriageMap(Document document) {
+    private static Map<String, FamilyEvent> getMarriageMap(Document document, Map<String, String> placeMap) {
 
-        Map<String, Marriage> marriageMap = new HashMap<>();
+        Map<String, FamilyEvent> marriageMap = new HashMap<>();
 
         NodeList nodeList = document.getElementsByTagName("Marriage");
 
@@ -494,12 +491,36 @@ public class DataParser {
 
             String id = marriageElement.getAttribute("ID");
             GenoDate date = new GenoDate(marriageNodeValueMap.get("Date"));
+            String place = null;
+            if (marriageNodeValueMap.containsKey("Place")) {
+                place = placeMap.getOrDefault(marriageNodeValueMap.get("Place"), null);
+            }
             String comment = marriageNodeValueMap.get("Comment");
 
-            marriageMap.put(id, new Marriage(date, comment));
+            marriageMap.put(id, new FamilyEvent(FamilyEvent.MARRIAGE, date, place, comment));
         }
 
         return marriageMap;
+    }
+
+    public static Map<String, String> getPlaceMap(Document document) {
+
+        Map<String, String> placeMap = new HashMap<>();
+
+        NodeList nodeList = document.getElementsByTagName("Place");
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+
+            Element placeElement = (Element) nodeList.item(i);
+            Map<String, String> placeNodeValueMap = getNodeValueMap(placeElement);
+
+            String id = placeElement.getAttribute("ID");
+            String place = placeNodeValueMap.get("Name");
+
+            placeMap.put(id, place);
+        }
+
+        return placeMap;
     }
 
     private static Map<String, Position> getTwinPositionMap(Document document) {
