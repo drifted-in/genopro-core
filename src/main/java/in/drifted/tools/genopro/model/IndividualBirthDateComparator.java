@@ -18,11 +18,11 @@ package in.drifted.tools.genopro.model;
 import java.time.LocalDate;
 import java.util.Comparator;
 
-public class IndividuaBirthDateComparator implements Comparator<Individual> {
+public class IndividualBirthDateComparator implements Comparator<Individual> {
 
     private boolean ascending = true;
 
-    public IndividuaBirthDateComparator(boolean ascending) {
+    public IndividualBirthDateComparator(boolean ascending) {
         this.ascending = ascending;
     }
 
