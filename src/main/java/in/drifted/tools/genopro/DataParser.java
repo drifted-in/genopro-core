@@ -94,16 +94,16 @@ public class DataParser {
      */
     public static DocumentInfo getDocumentInfo(Document document) {
 
-        DocumentInfo documentInfo = null;
+        DocumentInfo documentInfo = new DocumentInfo("", "");
 
         Node documentNode = getSingleNode(document.getDocumentElement(), "Document");
 
         if (documentNode != null) {
             Map<String, String> nodeValueMap = getNodeValueMap(documentNode);
-            String title = nodeValueMap.get("Title");
-            String description = nodeValueMap.get("Description");
+            String title = nodeValueMap.getOrDefault("Title", "");
+            String description = nodeValueMap.getOrDefault("Description", "");
 
-            documentInfo = new DocumentInfo((title != null) ? title : "", (description != null) ? description : "");
+            documentInfo = new DocumentInfo(title, description);
         }
 
         return documentInfo;
