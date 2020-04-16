@@ -594,9 +594,7 @@ public class DataParser {
             String lastName = nameMap.get("Last");
             String lastName2 = nameMap.get("Last2");
 
-            if (!(firstName == null && lastName == null)) {
-                name = new Name(firstName, middleName, lastName, lastName2);
-            }
+            name = new Name(firstName, middleName, lastName, lastName2);
         }
 
         return name;
