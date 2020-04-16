@@ -611,10 +611,12 @@ public class DataParser {
         if (birthNode != null) {
             Map<String, String> birthMap = getNodeValueMap(birthNode);
 
-            String date = birthMap.get("Date");
-            String comment = birthMap.get("Comment");
+            if (birthMap.containsKey("Date")) {
+                String date = birthMap.get("Date");
+                String comment = birthMap.get("Comment");
 
-            birth = new Birth(new GenoDate(date), comment);
+                birth = new Birth(new GenoDate(date), comment);
+            }
         }
 
         return birth;
@@ -629,10 +631,12 @@ public class DataParser {
         if (deathNode != null) {
             Map<String, String> deathMap = getNodeValueMap(deathNode);
 
-            String date = deathMap.get("Date");
-            String comment = deathMap.get("Comment");
+            if (deathMap.containsKey("Date")) {
+                String date = deathMap.get("Date");
+                String comment = deathMap.get("Comment");
 
-            death = new Death(new GenoDate(date), comment);
+                death = new Death(new GenoDate(date), comment);
+            }
         }
 
         return death;
