@@ -16,6 +16,7 @@
 package in.drifted.tools.genopro.util;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,12 +24,18 @@ import java.util.Map.Entry;
 
 public class MapUtil {
 
-    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map, Comparator comparator) {
 
         Map<K, V> result = new LinkedHashMap<>();
 
         List<Entry<K, V>> list = new ArrayList<>(map.entrySet());
-        list.sort(Entry.comparingByValue());
+
+        if (comparator != null) {
+            list.sort(Entry.comparingByValue(comparator));
+
+        } else {
+            list.sort(Entry.comparingByValue());
+        }
 
         for (Entry<K, V> entry : list) {
             result.put(entry.getKey(), entry.getValue());
