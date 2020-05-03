@@ -18,6 +18,7 @@ package in.drifted.tools.genopro;
 import in.drifted.tools.genopro.model.Birth;
 import in.drifted.tools.genopro.model.BoundaryRect;
 import in.drifted.tools.genopro.model.Death;
+import in.drifted.tools.genopro.model.DisplayStyle;
 import in.drifted.tools.genopro.model.DocumentInfo;
 import in.drifted.tools.genopro.model.Family;
 import in.drifted.tools.genopro.model.FamilyLineType;
@@ -94,16 +95,24 @@ public class DataParser {
      */
     public static DocumentInfo getDocumentInfo(Document document) {
 
-        DocumentInfo documentInfo = new DocumentInfo("", "");
+        DocumentInfo documentInfo = new DocumentInfo("", "", DisplayStyle.NOTHING);
 
         Node documentNode = getSingleNode(document.getDocumentElement(), "Document");
 
         if (documentNode != null) {
+
             Map<String, String> nodeValueMap = getNodeValueMap(documentNode);
             String title = nodeValueMap.getOrDefault("Title", "");
             String description = nodeValueMap.getOrDefault("Description", "");
+            DisplayStyle displayStyle = DisplayStyle.NOTHING;
 
-            documentInfo = new DocumentInfo(title, description);
+            Node displayNode = getSingleNode(document.getDocumentElement(), "Tag");
+
+            if (displayNode != null) {
+                displayStyle = DisplayStyle.parse(displayNode.getTextContent());
+            }
+
+            documentInfo = new DocumentInfo(title, description, displayStyle);
         }
 
         return documentInfo;
@@ -302,7 +311,8 @@ public class DataParser {
      * @return the collection of all families
      */
     public static Collection<Family> getFamilyCollection(Document document, Map<String, GenoMap> genoMapMap,
-            Map<String, Individual> individualMap, Map<String, List<PedigreeLink>> familyPedigreeLinkMap, Map<String, String> placeMap) {
+            Map<String, Individual> individualMap, Map<String, List<PedigreeLink>> familyPedigreeLinkMap,
+            Map<String, String> placeMap) {
 
         Collection<Family> familyCollection = new HashSet<>();
 
