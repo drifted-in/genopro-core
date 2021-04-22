@@ -17,19 +17,21 @@ package in.drifted.tools.genopro.model;
 
 public class Label {
 
-    private final String genoMap;
+    private final GenoMap genoMap;
     private final String text;
-    private final Position position;
-    private final Rect size;
+    private final Rect rect;
+    private final int zIndex;
+    private final LabelStyle labelStyle;
 
-    public Label(String genoMap, String text, Position position, Rect size) {
+    public Label(GenoMap genoMap, String text, Rect rect, int zIndex, LabelStyle labelStyle) {
         this.genoMap = genoMap;
         this.text = text;
-        this.position = position;
-        this.size = size;
+        this.rect = rect;
+        this.zIndex = zIndex;
+        this.labelStyle = labelStyle;
     }
 
-    public String getGenoMap() {
+    public GenoMap getGenoMap() {
         return genoMap;
     }
 
@@ -37,12 +39,16 @@ public class Label {
         return text;
     }
 
-    public Position getPosition() {
-        return position;
+    public Rect getRect() {
+        return rect;
     }
 
-    public Rect getSize() {
-        return size;
+    public int getzIndex() {
+        return zIndex;
+    }
+
+    public LabelStyle getLabelStyle() {
+        return labelStyle;
     }
 
 }

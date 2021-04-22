@@ -23,6 +23,7 @@ import in.drifted.tools.genopro.model.GenoMap;
 import in.drifted.tools.genopro.model.GenoMapData;
 import in.drifted.tools.genopro.model.IndividualHorizontalPositionComparator;
 import in.drifted.tools.genopro.model.Individual;
+import in.drifted.tools.genopro.model.Label;
 import in.drifted.tools.genopro.model.ParserOptions;
 import in.drifted.tools.genopro.model.PedigreeLink;
 import java.util.ArrayList;
@@ -56,6 +57,11 @@ public class DataUtil {
                 DataParser.getFamilyPedigreeLinkMap(document, individualMap);
         Collection<Family> familyCollection = DataParser.getFamilyCollection(document, genoMapMap, individualMap,
                 familyPedigreeLinkMap, placeMap);
+        Collection<Label> labelCollection = new HashSet<>();
+       
+        if (!parserOptions.hasLabelsExcluded()) {
+            labelCollection = DataParser.getLabelCollection(document, genoMapMap);
+        }
 
         if (parserOptions.getHighlightMode() > 0) {
             individualMap = HighlightUtil.getEnhancedIndividualMap(parserOptions.getHighlightMode(), individualMap,
@@ -81,11 +87,21 @@ public class DataUtil {
         for (Family family : familyCollection) {
             familyMap.get(family.getGenoMap()).add(family);
         }
+        
+        Map<GenoMap, Collection<Label>> labelMap = new HashMap<>();
+        
+        for (GenoMap genoMap : genoMapMap.values()) {
+            labelMap.put(genoMap, new HashSet<>());
+        }
+                
+        for (Label label : labelCollection) {
+            labelMap.get(label.getGenoMap()).add(label);
+        }
 
         for (GenoMap genoMap : genoMapMap.values()) {
-            if (!(genoMap.getTitle() == null && parserOptions.isExcludeUntitledGenoMaps())) {
+            if (!(genoMap.getTitle() == null && parserOptions.hasUntitledGenoMapsExcluded())) {
                 genoMapDataList.add(new GenoMapData(genoMap, genoMapIndividualMap.get(genoMap),
-                        familyMap.get(genoMap), null));
+                        familyMap.get(genoMap), labelMap.get(genoMap)));
             }
         }
 

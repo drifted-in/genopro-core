@@ -25,7 +25,10 @@ public class StringUtil {
 
         List<String> wrappedLineList = new ArrayList<>();
 
-        if (!line.isEmpty()) {
+        if (line.isEmpty()) {
+            wrappedLineList.add(line);
+
+        } else {
 
             String[] words = line.split(" ");
 
@@ -42,6 +45,8 @@ public class StringUtil {
                         wrappedLineList.add(getWrappedLine(words, startIndex, i));
                         width = 0;
                         startIndex = i + 1;
+                    } else {
+                        width += spaceWidth;
                     }
                 } else {
                     wrappedLineList.add(getWrappedLine(words, startIndex, i));

@@ -19,34 +19,52 @@ import java.time.LocalDate;
 
 public class ParserOptions {
 
-    private boolean excludeUntitledGenoMaps = false;
-    private boolean excludeUnknownIndividuals = false;
-    private boolean resolveHyperlinks = false;
+    private boolean labelsExcluded = false;
+    private boolean shapesExcluded = false;
+    private boolean untitledGenoMapsExcluded = false;
+    private boolean unknownIndividualsExcluded = false;
+    private boolean hyperlinksResolved = false;
     private LocalDate anonymizedSinceDate = null;
     private int highlightMode = 0;
 
-    public boolean isExcludeUntitledGenoMaps() {
-        return excludeUntitledGenoMaps;
+    public boolean hasLabelsExcluded() {
+        return labelsExcluded;
     }
 
-    public void setExcludeUntitledGenoMaps(boolean excludeUntitledGenoMaps) {
-        this.excludeUntitledGenoMaps = excludeUntitledGenoMaps;
+    public void setLabelsExcluded(boolean labelsExcluded) {
+        this.labelsExcluded = labelsExcluded;
     }
 
-    public boolean isExcludeUnknownIndividuals() {
-        return excludeUnknownIndividuals;
+    public boolean hasShapesExcluded() {
+        return shapesExcluded;
     }
 
-    public void setExcludeUnknownIndividuals(boolean excludeUnknownIndividuals) {
-        this.excludeUnknownIndividuals = excludeUnknownIndividuals;
+    public void setShapesExcluded(boolean shapesExcluded) {
+        this.shapesExcluded = shapesExcluded;
     }
 
-    public boolean isResolveHyperlinks() {
-        return resolveHyperlinks;
+    public boolean hasUntitledGenoMapsExcluded() {
+        return untitledGenoMapsExcluded;
     }
 
-    public void setResolveHyperlinks(boolean resolveHyperlinks) {
-        this.resolveHyperlinks = resolveHyperlinks;
+    public void setUntitledGenoMapsExcluded(boolean untitledGenoMapsExcluded) {
+        this.untitledGenoMapsExcluded = untitledGenoMapsExcluded;
+    }
+
+    public boolean hasUnknownIndividualsExcluded() {
+        return unknownIndividualsExcluded;
+    }
+
+    public void setUnknownIndividualsExcluded(boolean unknownIndividualsExcluded) {
+        this.unknownIndividualsExcluded = unknownIndividualsExcluded;
+    }
+
+    public boolean hasHyperlinksResolved() {
+        return hyperlinksResolved;
+    }
+
+    public void setHyperlinksResolved(boolean hyperlinksResolved) {
+        this.hyperlinksResolved = hyperlinksResolved;
     }
 
     public LocalDate getAnonymizedSinceDate() {

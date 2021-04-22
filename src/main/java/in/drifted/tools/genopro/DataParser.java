@@ -15,8 +15,11 @@
  */
 package in.drifted.tools.genopro;
 
+import in.drifted.tools.genopro.model.Alignment;
 import in.drifted.tools.genopro.model.Birth;
+import in.drifted.tools.genopro.model.Border;
 import in.drifted.tools.genopro.model.BoundaryRect;
+import in.drifted.tools.genopro.model.Color;
 import in.drifted.tools.genopro.model.Death;
 import in.drifted.tools.genopro.model.DisplayStyle;
 import in.drifted.tools.genopro.model.DocumentInfo;
@@ -33,7 +36,11 @@ import in.drifted.tools.genopro.model.ParserOptions;
 import in.drifted.tools.genopro.model.PedigreeLink;
 import in.drifted.tools.genopro.model.Position;
 import in.drifted.tools.genopro.model.FamilyRelationType;
+import in.drifted.tools.genopro.model.Label;
+import in.drifted.tools.genopro.model.LabelStyle;
 import in.drifted.tools.genopro.model.PedigreeLinkType;
+import in.drifted.tools.genopro.model.Rect;
+import in.drifted.tools.genopro.model.Size;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -152,7 +159,8 @@ public class DataParser {
     }
 
     /**
-     * Returns the map of all individuals. The map can be pre-filtered if additional options are specified.
+     * Returns the map of all individuals. The map can be pre-filtered if
+     * additional options are specified.
      *
      * @param document GenoPro XML document
      * @param genoMapMap map of all GenoMaps
@@ -174,7 +182,8 @@ public class DataParser {
     }
 
     /**
-     * Returns the collection of all individuals. The list can be pre-filtered if additional options are specified.
+     * Returns the collection of all individuals. The list can be pre-filtered
+     * if additional options are specified.
      *
      * @param document GenoPro XML document
      * @param genoMapMap map of all GenoMaps
@@ -192,12 +201,12 @@ public class DataParser {
 
             Individual individual = getIndividual(genoMapMap, (Element) nodeList.item(i));
 
-            if (!(individual.getName() == null && parserOptions.isExcludeUnknownIndividuals())) {
+            if (!(individual.getName() == null && parserOptions.hasUnknownIndividualsExcluded())) {
                 individualCollection.add(individual);
             }
         }
 
-        if (parserOptions.isResolveHyperlinks()) {
+        if (parserOptions.hasHyperlinksResolved()) {
             individualCollection = getResolvedIndividualCollection(individualCollection, parserOptions);
         }
 
@@ -239,7 +248,7 @@ public class DataParser {
 
                 Hyperlink hyperlink = null;
 
-                if (!(targetGenoMap.getTitle() == null && parserOptions.isExcludeUntitledGenoMaps())) {
+                if (!(targetGenoMap.getTitle() == null && parserOptions.hasUntitledGenoMapsExcluded())) {
                     hyperlink = new Hyperlink(targetIndividual.getGenoMap(), hyperlinkId);
                 }
 
@@ -412,7 +421,7 @@ public class DataParser {
                 FamilyLineType familyLineType = FamilyLineType.parse(familyNodeValueMap.get("FamilyLine"));
                 FamilyRelationType relationType = FamilyRelationType.parse(familyNodeValueMap.get("Relation"));
                 Element positionElement = (Element) getSingleNode(familyElement, "Position");
-                String genoMapName = positionElement.getAttribute("GenoMap");
+                GenoMap genoMap = getGenoMap(genoMapMap, positionElement.getAttribute("GenoMap"));
                 Position position = getPosition(positionElement.getFirstChild().getTextContent().trim());
 
                 BoundaryRect topBoundaryRect = null;
@@ -428,12 +437,6 @@ public class DataParser {
                     Map<String, String> bottomNodeValueMap = getNodeValueMap(bottomNode);
                     bottomBoundaryRect = getBoundaryRect(bottomNodeValueMap.get("Left") + ","
                             + bottomNodeValueMap.get("Right"));
-                }
-
-                GenoMap genoMap = genoMapMap.get(genoMapName);
-
-                if (genoMap == null) {
-                    genoMap = genoMapMap.values().iterator().next();
                 }
 
                 familyCollection.add(new Family(familyId, fatherId, motherId, genoMap, label, relationType,
@@ -550,6 +553,66 @@ public class DataParser {
         return twinPositionMap;
     }
 
+    public static Collection<Label> getLabelCollection(Document document, Map<String, GenoMap> genoMapMap) {
+
+        Collection<Label> labelCollection = new HashSet<>();
+
+        Element labelsElement = (Element) getSingleNode(document.getDocumentElement(), "Labels");
+
+        if (labelsElement != null) {
+            NodeList nodeList = labelsElement.getElementsByTagName("Label");
+
+            for (int i = 0; i < nodeList.getLength(); i++) {
+
+                Element labelElement = (Element) nodeList.item(i);
+                Element positionElement = (Element) getSingleNode(labelElement, "Position");
+                GenoMap genoMap = getGenoMap(genoMapMap, positionElement.getAttribute("GenoMap"));
+
+                int zIndex = positionElement.hasAttribute("z") ? Integer.parseInt(positionElement.getAttribute("z")) : 0;
+                Position position = getPosition(positionElement.getFirstChild().getTextContent().trim());
+                int width = Integer.parseInt(positionElement.getAttribute("Width"));
+                int height = Integer.parseInt(positionElement.getAttribute("Height"));
+                Rect rect = new Rect(position.getX(), position.getY(), width, height);
+                Element textElement = (Element) getSingleNode(labelElement, "Text");
+                String text = textElement.getFirstChild().getTextContent().trim();
+                Element alignmentElement = (Element) getSingleNode(textElement, "Alignment");
+
+                Size textSize = getSize(positionElement.getAttribute("Size"), Size.M);
+                Alignment horizontalAlignment = Alignment.CENTER;
+                Alignment verticalAlignment = Alignment.CENTER;
+
+                if (alignmentElement != null) {
+                    horizontalAlignment = getAlignment(alignmentElement.getAttribute("Horizontal"), Alignment.CENTER);
+                    verticalAlignment = getAlignment(alignmentElement.getAttribute("Vertical"), Alignment.CENTER);
+                }
+
+                int padding = Integer.parseInt(textElement.getAttribute("Padding"));
+
+                Element colorElement = (Element) getSingleNode(labelElement, "Color");
+                Color textColor = getColor(colorElement.getAttribute("Text"));
+                Color fillColor = getColor(colorElement.getAttribute("Fill"));
+                Color borderColor = getColor(colorElement.getAttribute("Border"));
+
+                Element borderElement = (Element) getSingleNode(labelElement, "Border");
+                Size borderSize = textSize;
+                String borderPattern = "-";
+
+                if (borderElement != null) {
+                    borderSize = getSize(borderElement.getAttribute("Width"), borderSize);
+                    borderPattern = borderElement.hasAttribute("Pattern") ? borderElement.getAttribute("Pattern") : "-";
+                }
+
+                Border border = new Border(borderColor, borderSize, borderPattern);
+
+                LabelStyle labelStyle = new LabelStyle(textSize, horizontalAlignment, verticalAlignment, padding,
+                        textColor, fillColor, border);
+                labelCollection.add(new Label(genoMap, text, rect, zIndex, labelStyle));
+            }
+        }
+
+        return labelCollection;
+    }
+
     private static Individual getIndividual(Map<String, GenoMap> genoMapMap, Element individualElement) {
 
         Name name = getName(individualElement);
@@ -575,13 +638,7 @@ public class DataParser {
         Element positionElement = (Element) getSingleNode(individualElement, "Position");
         Position position = getPosition(positionElement.getTextContent());
         BoundaryRect boundaryRect = getBoundaryRect(positionElement.getAttribute("BoundaryRect"));
-        String genoMapName = positionElement.getAttribute("GenoMap");
-
-        GenoMap genoMap = genoMapMap.get(genoMapName);
-
-        if (genoMap == null) {
-            genoMap = genoMapMap.values().iterator().next();
-        }
+        GenoMap genoMap = getGenoMap(genoMapMap, positionElement.getAttribute("GenoMap"));
 
         Set<String> highlightKeySet = getHighlightKeySet(individualElement);
 
@@ -589,6 +646,14 @@ public class DataParser {
                 birth, death, isDead, false, position, boundaryRect, highlightKeySet);
     }
 
+    private static GenoMap getGenoMap(Map<String, GenoMap> genoMapMap, String genoMapName) {
+        if (genoMapName.isEmpty() && genoMapMap.size() == 1) {
+            return genoMapMap.values().iterator().next();
+        } else {
+            return genoMapMap.get(genoMapName);
+        }
+    }
+    
     private static Name getName(Element individual) {
 
         Name name = null;
@@ -674,6 +739,61 @@ public class DataParser {
         }
 
         return new BoundaryRect(values[0], values[1], values[2], values[3]);
+    }
+
+    private static Size getSize(String size, Size defaultSize) {
+
+        if (size != null) {
+
+            switch (size) {
+                case "T":
+                    return Size.T;
+                case "S":
+                    return Size.S;
+                case "L":
+                    return Size.L;
+                case "M":
+                    return Size.M;
+                case "X":
+                    return Size.XL;
+                case "XX":
+                    return Size.XXL;
+                case "XXX":
+                    return Size.XXXL;
+                case "XXXX":
+                    return Size.XXXXL;
+            }
+        }
+        return defaultSize;
+    }
+
+    private static Alignment getAlignment(String alignment, Alignment defaultAlignment) {
+
+        if (alignment != null) {
+
+            switch (alignment) {
+                case "Center":
+                    return Alignment.CENTER;
+                case "Top":
+                    return Alignment.TOP;
+                case "Left":
+                    return Alignment.LEFT;
+                case "Bottom":
+                    return Alignment.BOTTOM;
+                case "Right":
+                    return Alignment.RIGHT;
+            }
+        }
+        return defaultAlignment;
+    }
+
+    private static Color getColor(String color) {
+
+        if (color == null) {
+            return new Color(0, 0, 0);
+        } else {
+            return new Color(color);
+        }
     }
 
     private static Set<String> getHighlightKeySet(Element individualElement) {
