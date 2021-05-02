@@ -647,7 +647,7 @@ public class DataParser {
     }
 
     private static GenoMap getGenoMap(Map<String, GenoMap> genoMapMap, String genoMapName) {
-        if (genoMapName.isEmpty() && genoMapMap.size() == 1) {
+        if (genoMapName.isEmpty()) {
             return genoMapMap.values().iterator().next();
         } else {
             return genoMapMap.get(genoMapName);
