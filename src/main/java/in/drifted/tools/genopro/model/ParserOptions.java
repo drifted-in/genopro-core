@@ -25,7 +25,7 @@ public class ParserOptions {
     private boolean unknownIndividualsExcluded = false;
     private boolean hyperlinksResolved = false;
     private LocalDate anonymizedSinceDate = null;
-    private int highlightMode = 0;
+    private HighlightMode highlightMode = HighlightMode.NONE;
 
     public boolean hasLabelsExcluded() {
         return labelsExcluded;
@@ -75,11 +75,11 @@ public class ParserOptions {
         this.anonymizedSinceDate = anonymizedSinceDate;
     }
 
-    public int getHighlightMode() {
+    public HighlightMode getHighlightMode() {
         return highlightMode;
     }
 
-    public void setHighlightMode(int highlightMode) {
+    public void setHighlightMode(HighlightMode highlightMode) {
         this.highlightMode = highlightMode;
     }
 

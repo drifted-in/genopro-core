@@ -21,6 +21,7 @@ import in.drifted.tools.genopro.model.Family;
 import in.drifted.tools.genopro.model.FamilyRelation;
 import in.drifted.tools.genopro.model.GenoMap;
 import in.drifted.tools.genopro.model.GenoMapData;
+import in.drifted.tools.genopro.model.HighlightMode;
 import in.drifted.tools.genopro.model.IndividualHorizontalPositionComparator;
 import in.drifted.tools.genopro.model.Individual;
 import in.drifted.tools.genopro.model.Label;
@@ -63,7 +64,7 @@ public class DataUtil {
             labelCollection = DataParser.getLabelCollection(document, genoMapMap);
         }
 
-        if (parserOptions.getHighlightMode() > 0) {
+        if (parserOptions.getHighlightMode() != HighlightMode.NONE) {
             individualMap = HighlightUtil.getEnhancedIndividualMap(parserOptions.getHighlightMode(), individualMap,
                     familyPedigreeLinkMap);
         }
@@ -95,7 +96,7 @@ public class DataUtil {
         }
                 
         for (Label label : labelCollection) {
-            labelMap.get(label.getGenoMap()).add(label);
+                labelMap.get(label.getGenoMap()).add(label);
         }
 
         for (GenoMap genoMap : genoMapMap.values()) {
