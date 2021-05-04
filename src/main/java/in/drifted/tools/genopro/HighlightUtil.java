@@ -16,6 +16,7 @@
 package in.drifted.tools.genopro;
 
 import in.drifted.tools.genopro.model.Gender;
+import in.drifted.tools.genopro.model.HighlightMode;
 import in.drifted.tools.genopro.model.Individual;
 import in.drifted.tools.genopro.model.PedigreeLink;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class HighlightUtil {
      * @param familyPedigreeLinkMap map of all family pedigree links
      * @return the map of all individuals with resolved highlight keys
      */
-    public static Map<String, Individual> getEnhancedIndividualMap(int highlightMode,
+    public static Map<String, Individual> getEnhancedIndividualMap(HighlightMode highlightMode,
             Map<String, Individual> individualMap, Map<String, List<PedigreeLink>> familyPedigreeLinkMap) {
 
         Map<String, Individual> enhancedIndividualMap = new HashMap<>();
@@ -67,111 +68,18 @@ public class HighlightUtil {
      * @param familyPedigreeLinkMap map of all family pedigree links
      * @return the map of highlight keys for all individuals
      */
-    public static Map<String, Set<String>> getHighlightKeyMap(int highlightMode, Map<String, Individual> individualMap,
+    public static Map<String, Set<String>> getHighlightKeyMap(HighlightMode highlightMode, Map<String, Individual> individualMap,
             Map<String, List<PedigreeLink>> familyPedigreeLinkMap) {
 
         Map<String, Set<String>> highlightKeyMap = new HashMap<>();
-        Map<String, Set<String>> deducedHighlightKeyMap = new HashMap<>();
-        Map<String, Map<String, Set<String>>> childMap = new HashMap<>();
 
-        Gender gender = (highlightMode == 2) ? Gender.FEMALE : Gender.MALE;
+        Gender gender = (highlightMode == HighlightMode.MATERNAL) ? Gender.FEMALE : Gender.MALE;
 
-        for (List<PedigreeLink> pedigreeLinkList : familyPedigreeLinkMap.values()) {
+        Map<String, Map<String, Set<String>>> childMap = getChildMap(familyPedigreeLinkMap, individualMap, gender);
 
-            Map<String, Set<String>> childInfoMap = new HashMap<>();
-
-            String parentId = null;
-
-            // assing child info to the parent
-            for (PedigreeLink pedigreeLink : pedigreeLinkList) {
-
-                if (pedigreeLink.isParent()) {
-
-                    Individual individual = individualMap.get(pedigreeLink.getIndividualId());
-
-                    if (individual.getGender() == gender) {
-
-                        parentId = pedigreeLink.getIndividualId();
-
-                        // cummulate children from multiple families
-                        if (childMap.containsKey(parentId)) {
-                            childInfoMap = childMap.get(parentId);
-
-                        } else {
-                            childMap.put(parentId, new HashMap<>());
-                            childInfoMap = childMap.get(parentId);
-                        }
-                    }
-                }
-            }
-
-            // fill-in child info
-            for (PedigreeLink pedigreeLink : pedigreeLinkList) {
-
-                if (!pedigreeLink.isParent()) {
-                    String childId = pedigreeLink.getIndividualId();
-                    Individual individual = individualMap.get(childId);
-                    if (individual.getGender() == gender) {
-                        childInfoMap.put(childId, individual.getHighlightKeySet());
-                    }
-                }
-            }
-
-            // override parent keys if these can be deduced from children keys
-            if (parentId != null) {
-
-                // check for highlight key duplicities
-                if (childInfoMap.isEmpty()) {
-                    Set<String> highlightKeySet = new HashSet<>();
-                    highlightKeySet.add("n/a");
-
-                    deducedHighlightKeyMap.put(parentId, highlightKeySet);
-
-                } else {
-
-                    List<String> highlightKeyList = new ArrayList<>();
-
-                    for (Set<String> highlightKeySet : childInfoMap.values()) {
-                        highlightKeyList.addAll(highlightKeySet);
-                    }
-
-                    Set<String> duplicateSet = getDuplicateSet(highlightKeyList);
-
-                    if (duplicateSet.size() == 1) {
-                        deducedHighlightKeyMap.put(parentId, duplicateSet);
-                    }
-                }
-            }
-        }
-
-        // fill terminal nodes
-        for (Map.Entry<String, Map<String, Set<String>>> entry : childMap.entrySet()) {
-            for (Map.Entry<String, Set<String>> childInfoEntry : entry.getValue().entrySet()) {
-
-                if (!childMap.containsKey(childInfoEntry.getKey())) {
-                    Set<String> highlightKeySet = childInfoEntry.getValue();
-                    if (highlightKeySet.isEmpty()) {
-                        highlightKeySet.add("n/a");
-                    }
-                    highlightKeyMap.put(childInfoEntry.getKey(), highlightKeySet);
-                }
-            }
-        }
-
-        Map<String, Set<String>> parentChildMap = new HashMap<>();
-
-        for (Map.Entry<String, Map<String, Set<String>>> entry : childMap.entrySet()) {
-            parentChildMap.put(entry.getKey(), entry.getValue().keySet());
-        }
-
-        Map<String, String> childParentMap = new HashMap<>();
-
-        for (Map.Entry<String, Set<String>> entry : parentChildMap.entrySet()) {
-            for (String childId : entry.getValue()) {
-                childParentMap.put(childId, entry.getKey());
-            }
-        }
-
+        highlightKeyMap.putAll(getTerminalNodesHighlightKeyMap(childMap));
+        
+         // resolving children
         boolean hasUnresolvedChildren;
 
         do {
@@ -180,37 +88,68 @@ public class HighlightUtil {
 
             for (Map.Entry<String, Map<String, Set<String>>> entry : childMap.entrySet()) {
 
-                String key = entry.getKey();
+                String parentId = entry.getKey();
 
-                if (deducedHighlightKeyMap.containsKey(key)) {
-                    processedChildIdSet.add(key);
-                    highlightKeyMap.put(key, deducedHighlightKeyMap.get(key));
+                int childrenCount = entry.getValue().size();
+
+                if (childrenCount == 0) {
+                    processedChildIdSet.add(parentId);
+
+                } else if (childrenCount == 1) {
+                    String childId = entry.getValue().keySet().iterator().next();
+                    if (highlightKeyMap.containsKey(childId)) {
+                        highlightKeyMap.put(parentId, highlightKeyMap.get(childId));
+                        processedChildIdSet.add(parentId);
+                    } else {
+                        hasUnresolvedChildren = true;
+                    }
 
                 } else {
-                    Set<String> hightlightKeySet = new HashSet<>();
+                    List<String> highlightKeyList = new ArrayList<>();
 
+                    // for each of two or more children
                     for (Map.Entry<String, Set<String>> childInfoEntry : entry.getValue().entrySet()) {
 
                         if (highlightKeyMap.containsKey(childInfoEntry.getKey())) {
-                            hightlightKeySet.addAll(highlightKeyMap.get(childInfoEntry.getKey()));
+                            highlightKeyList.addAll(highlightKeyMap.get(childInfoEntry.getKey()));
 
                         } else {
                             Set<String> childHighlightKeySet = childInfoEntry.getValue();
 
                             if (!childHighlightKeySet.isEmpty()) {
-                                hightlightKeySet.addAll(childHighlightKeySet);
+                                highlightKeyList.addAll(childHighlightKeySet);
 
                             } else {
                                 hasUnresolvedChildren = true;
-                                hightlightKeySet.clear();
+                                highlightKeyList.clear();
                                 break;
                             }
                         }
                     }
 
-                    if (!hightlightKeySet.isEmpty()) {
-                        processedChildIdSet.add(key);
-                        highlightKeyMap.put(key, hightlightKeySet);
+                    if (!highlightKeyList.isEmpty()) {
+
+                        // if at least two children share same key (but only one), it is set also to parent
+                        if (childrenCount > 1) {
+                            Map<String, Integer> highlightKeyHistogram = new HashMap<>();
+                            for (String highlightKey : highlightKeyList) {
+                                int count = highlightKeyHistogram.getOrDefault(highlightKey, 0);
+                                highlightKeyHistogram.put(highlightKey, count + 1);
+                            }
+                            Set<String> candidateSet = new HashSet<>();
+                            for (Map.Entry<String, Integer> histogramEntry : highlightKeyHistogram.entrySet()) {
+                                if (histogramEntry.getValue() > 1) {
+                                    candidateSet.add(histogramEntry.getKey());
+                                }
+                            }
+                            if (candidateSet.size() == 1 && !candidateSet.iterator().next().equals("n/a")) {
+                                highlightKeyList.clear();
+                                highlightKeyList.addAll(candidateSet);
+                            }
+                        }
+
+                        processedChildIdSet.add(parentId);
+                        highlightKeyMap.put(parentId, new HashSet<>(highlightKeyList));
                     }
                 }
             }
@@ -219,148 +158,93 @@ public class HighlightUtil {
 
         } while (hasUnresolvedChildren);
 
-        // deduplication
-        boolean hasChanged;
-
-        do {
-            hasChanged = false;
-
-            for (Entry<String, Set<String>> entry : parentChildMap.entrySet()) {
-
-                if (highlightKeyMap.get(entry.getKey()).size() > 1) {
-
-                    List<String> highlightKeyList = new ArrayList<>();
-
-                    for (String id : entry.getValue()) {
-                        highlightKeyList.addAll(highlightKeyMap.get(id));
-                    }
-
-                    Set<String> duplicateSet = getDuplicateSet(highlightKeyList);
-
-                    duplicateSet.remove("n/a");
-
-                    if (duplicateSet.isEmpty()) {
-                        Set<String> highlightKeySet = new HashSet<>(highlightKeyList);
-                        highlightKeySet.remove("n/a");
-
-                        if (highlightKeySet.size() == 1) {
-                            highlightKeyMap.put(entry.getKey(), highlightKeySet);
-                            hasChanged = true;
-
-                        } else if (!highlightKeyList.isEmpty()) {
-                            String parentId = childParentMap.get(entry.getKey());
-                            if (highlightKeyMap.containsKey(parentId)) {
-                                Set<String> parentHightlightKeySet = highlightKeyMap.get(parentId);
-                                if (parentHightlightKeySet.size() == 1) {
-                                    highlightKeyList.addAll(highlightKeyMap.get(parentId));
-                                    duplicateSet = getDuplicateSet(highlightKeyList);
-                                    duplicateSet.remove("n/a");
-                                }
-                            } else {
-                                if (parentId == null) {
-                                    int originalSize = highlightKeyMap.get(entry.getKey()).size();
-                                    if (highlightKeySet.size() < originalSize) {
-                                        highlightKeyMap.put(entry.getKey(), highlightKeySet);
-                                        hasChanged = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (duplicateSet.size() == 1) {
-                        highlightKeyMap.put(entry.getKey(), duplicateSet);
-                        hasChanged = true;
-                    }
-                }
-            }
-
-        } while (hasChanged);
-
-        // inherit parent value to ancestors
-        Set<String> resolvedParentSet = new HashSet<>();
-        Set<String> processedParentSet = new HashSet<>();
-
-        for (String parentId : childParentMap.values()) {
-            if (!childParentMap.containsKey(parentId)) {
-                resolvedParentSet.add(parentId);
-            }
-        }
-
-        do {
-            hasChanged = false;
-
-            for (Entry<String, Set<String>> entry : parentChildMap.entrySet()) {
-
-                String parentId = entry.getKey();
-
-                if (resolvedParentSet.contains(parentId)) {
-
-                    if (!processedParentSet.contains(parentId)) {
-
-                        Set<String> parentHighlightKeySet = highlightKeyMap.get(parentId);
-
-                        List<String> singleKeyList = new ArrayList<>();
-
-                        for (String childId : entry.getValue()) {
-                            Set<String> childHighlightKeySet = highlightKeyMap.get(childId);
-                            if (childHighlightKeySet.size() == 1) {
-                                singleKeyList.addAll(childHighlightKeySet);
-                            }
-                        }
-
-                        Set<String> duplicateSet = getDuplicateSet(singleKeyList);
-
-                        for (String childId : entry.getValue()) {
-
-                            Set<String> childHighlightKeySet = highlightKeyMap.get(childId);
-                            Set<String> matchingSet = new HashSet<>(duplicateSet);
-                            matchingSet.retainAll(childHighlightKeySet);
-
-                            if (!individualMap.get(childId).getHighlightKeySet().isEmpty()) {
-                                // do nothing if child has exact value
-
-                            } else if (childHighlightKeySet.size() > 1 && matchingSet.isEmpty()) {
-                                // do nothing if child apparently do not inherit from parent
-
-                            } else if (childHighlightKeySet.size() == 1 && !matchingSet.isEmpty()) {
-                                // override parent value(s) with the child one
-                                if (parentHighlightKeySet.retainAll(childHighlightKeySet)) {
-                                    // we need another iteration if the parent keys were reduced to a single value
-                                    hasChanged = true;
-                                }
-
-                            } else {
-                                if (childHighlightKeySet.addAll(parentHighlightKeySet)) {
-                                    hasChanged = true;
-                                }
-                            }
-
-                            resolvedParentSet.add(childId);
-                        }
-
-                        processedParentSet.add(parentId);
-                    }
-                }
-            }
-
-        } while (hasChanged);
-
         return highlightKeyMap;
     }
 
-    public static Set<String> getDuplicateSet(List<String> list) {
+    private static Map<String, Map<String, Set<String>>> getChildMap(Map<String, List<PedigreeLink>> familyPedigreeLinkMap,
+            Map<String, Individual> individualMap, Gender gender) {
 
-        Set<String> duplicateSet = new HashSet<>();
+        Map<String, Map<String, Set<String>>> childMap = new HashMap<>();
 
-        Set<String> tempSet = new HashSet<>();
+        for (List<PedigreeLink> pedigreeLinkList : familyPedigreeLinkMap.values()) {
 
-        for (String item : list) {
-            if (!tempSet.add(item)) {
-                duplicateSet.add(item);
+            String parentId = getParentId(individualMap, pedigreeLinkList, gender);
+
+            childMap.put(parentId, getChildInfoMap(individualMap, pedigreeLinkList, gender));
+        }
+
+        return childMap;
+    }
+
+    private static String getParentId(Map<String, Individual> individualMap,
+            List<PedigreeLink> pedigreeLinkList, Gender gender) {
+
+        String parentId = null;
+
+        for (PedigreeLink pedigreeLink : pedigreeLinkList) {
+
+            if (pedigreeLink.isParent()) {
+
+                Individual individual = individualMap.get(pedigreeLink.getIndividualId());
+
+                if (individual.getGender() == gender) {
+                    parentId = pedigreeLink.getIndividualId();
+                }
             }
         }
 
-        return duplicateSet;
+        return parentId;
     }
+
+    private static Map<String, Set<String>> getChildInfoMap(Map<String, Individual> individualMap,
+            List<PedigreeLink> pedigreeLinkList, Gender gender) {
+
+        Map<String, Set<String>> childInfoMap = new HashMap<>();
+
+        for (PedigreeLink pedigreeLink : pedigreeLinkList) {
+
+            if (!pedigreeLink.isParent()) {
+
+                String childId = pedigreeLink.getIndividualId();
+                Individual individual = individualMap.get(childId);
+
+                if (individual.getGender() == gender) {
+                    childInfoMap.put(childId, individual.getHighlightKeySet());
+                }
+            }
+        }
+
+        return childInfoMap;
+    }
+           
+    private static Map<String, Set<String>> getTerminalNodesHighlightKeyMap(Map<String, Map<String, Set<String>>> childMap) {
+        
+        Map<String, Set<String>> highlightKeyMap = new HashMap<>();
+        
+        Set<String> defaultHighlightKeySet = new HashSet<>();
+        defaultHighlightKeySet.add("n/a");
+        
+        // for each parent
+        for (Map.Entry<String, Map<String, Set<String>>> entry : childMap.entrySet()) {
+            // if parent has no children
+            if (entry.getValue().isEmpty()) {
+                highlightKeyMap.put(entry.getKey(), defaultHighlightKeySet);
+            }
+            // for each children
+            for (Map.Entry<String, Set<String>> childInfoEntry : entry.getValue().entrySet()) {
+                // if child doesn't have children
+                if (!childMap.containsKey(childInfoEntry.getKey())) {
+                    Set<String> highlightKeySet = childInfoEntry.getValue();
+                    if (highlightKeySet.isEmpty()) {
+                        highlightKeySet.addAll(defaultHighlightKeySet);
+                    }
+
+                    highlightKeyMap.put(childInfoEntry.getKey(), highlightKeySet);
+                }
+            }
+        }
+         
+        return highlightKeyMap;
+    }
+
 }
