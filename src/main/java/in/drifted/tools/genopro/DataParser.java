@@ -206,8 +206,8 @@ public class DataParser {
             }
         }
 
-        if (parserOptions.hasHyperlinksResolved()) {
-            individualCollection = getResolvedIndividualCollection(individualCollection, parserOptions);
+        if (parserOptions.hasHyperlinkedIndividualInstancesDeduplicated()) {
+            individualCollection = getDeduplicatedIndividualCollection(individualCollection, parserOptions);
         }
 
         if (parserOptions.getAnonymizedSinceDate() != null) {
@@ -217,10 +217,10 @@ public class DataParser {
         return individualCollection;
     }
 
-    private static Collection<Individual> getResolvedIndividualCollection(Collection<Individual> individualCollection,
+    private static Collection<Individual> getDeduplicatedIndividualCollection(Collection<Individual> individualCollection,
             ParserOptions parserOptions) {
 
-        Collection<Individual> resolvedIndividualCollection = new HashSet<>();
+        Collection<Individual> deduplicatedIndividualCollection = new HashSet<>();
 
         Map<String, Individual> individualMap = new HashMap<>();
         Map<String, String> hyperlinkMap = new HashMap<>();
@@ -253,24 +253,24 @@ public class DataParser {
                 }
 
                 if (individual.getHyperlink() == null) {
-                    resolvedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(),
+                    deduplicatedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(),
                             hyperlink, individual.getName(), individual.getGender(), individual.getBirth(),
                             individual.getDeath(), individual.isDead(), false, individual.getPosition(),
                             individual.getBoundaryRect(), individual.getHighlightKeySet()));
 
                 } else {
-                    resolvedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(),
+                    deduplicatedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(),
                             hyperlink, targetIndividual.getName(), targetIndividual.getGender(),
                             targetIndividual.getBirth(), targetIndividual.getDeath(), targetIndividual.isDead(), false,
                             individual.getPosition(), individual.getBoundaryRect(), individual.getHighlightKeySet()));
                 }
 
             } else {
-                resolvedIndividualCollection.add(individual);
+                deduplicatedIndividualCollection.add(individual);
             }
         }
 
-        return resolvedIndividualCollection;
+        return deduplicatedIndividualCollection;
     }
 
     private static Collection<Individual> getAnonymizedIndividualCollection(Collection<Individual> individualCollection,

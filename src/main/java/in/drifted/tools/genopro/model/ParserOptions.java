@@ -23,7 +23,7 @@ public class ParserOptions {
     private boolean shapesExcluded = false;
     private boolean untitledGenoMapsExcluded = false;
     private boolean unknownIndividualsExcluded = false;
-    private boolean hyperlinksResolved = false;
+    private boolean hyperlinkedIndividualInstancesDeduplicated = false;
     private LocalDate anonymizedSinceDate = null;
     private HighlightMode highlightMode = HighlightMode.NONE;
 
@@ -59,12 +59,12 @@ public class ParserOptions {
         this.unknownIndividualsExcluded = unknownIndividualsExcluded;
     }
 
-    public boolean hasHyperlinksResolved() {
-        return hyperlinksResolved;
+    public boolean hasHyperlinkedIndividualInstancesDeduplicated() {
+        return hyperlinkedIndividualInstancesDeduplicated;
     }
 
-    public void setHyperlinksResolved(boolean hyperlinksResolved) {
-        this.hyperlinksResolved = hyperlinksResolved;
+    public void setHyperlinkedIndividualInstancesDeduplicated(boolean hyperlinkedIndividualInstancesDeduplicated) {
+        this.hyperlinkedIndividualInstancesDeduplicated = hyperlinkedIndividualInstancesDeduplicated;
     }
 
     public LocalDate getAnonymizedSinceDate() {
