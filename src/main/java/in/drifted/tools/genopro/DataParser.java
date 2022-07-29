@@ -653,7 +653,7 @@ public class DataParser {
             return genoMapMap.get(genoMapName);
         }
     }
-    
+
     private static Name getName(Element individual) {
 
         Name name = null;

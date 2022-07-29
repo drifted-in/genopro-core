@@ -16,7 +16,7 @@
 package in.drifted.tools.genopro.model;
 
 public class LabelStyle {
-  
+
     private final Size size;
     private final Alignment horizontalAlignment;
     private final Alignment verticalAlignment;
@@ -62,5 +62,5 @@ public class LabelStyle {
     public Border getBorder() {
         return border;
     }
-    
+
 }

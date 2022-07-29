@@ -17,7 +17,7 @@ package in.drifted.tools.genopro.model;
 
 public enum HighlightMode {
    NONE, PATERNAL, MATERNAL;
-   
+
    public static HighlightMode of(int mode) {
        switch (mode) {
            case 1: return PATERNAL;

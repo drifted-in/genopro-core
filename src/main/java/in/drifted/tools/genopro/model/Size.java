@@ -16,5 +16,5 @@
 package in.drifted.tools.genopro.model;
 
 public enum Size {
-    T, S, M, L, XL, XXL, XXXL, XXXXL 
+    T, S, M, L, XL, XXL, XXXL, XXXXL
 }

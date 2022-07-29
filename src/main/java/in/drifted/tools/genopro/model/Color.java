@@ -23,9 +23,9 @@ public class Color {
     private final double a;
 
     public Color(int r, int g, int b) {
-        this(r,g,b,1.0);
+        this(r, g, b, 1.0);
     }
-    
+
     public Color(int r, int g, int b, double a) {
         this.r = r;
         this.g = g;
@@ -33,12 +33,12 @@ public class Color {
         this.a = a;
     }
 
-    public Color(String hex) { 
+    public Color(String hex) {
         this(
-            Integer.valueOf(hex.substring(1, 3), 16),
-            Integer.valueOf(hex.substring(3, 5), 16),
-            Integer.valueOf(hex.substring(5, 7), 16),
-            (hex.length() == 9) ? Integer.valueOf(hex.substring(7, 9), 16) / 255 : 1.0);
+                Integer.valueOf(hex.substring(1, 3), 16),
+                Integer.valueOf(hex.substring(3, 5), 16),
+                Integer.valueOf(hex.substring(5, 7), 16),
+                (hex.length() == 9) ? Integer.valueOf(hex.substring(7, 9), 16) / 255 : 1.0);
     }
 
     @Override
@@ -76,8 +76,7 @@ public class Color {
         }
         return true;
     }
-    
-    
+
     public int getR() {
         return r;
     }
@@ -89,13 +88,13 @@ public class Color {
     public int getB() {
         return b;
     }
-    
+
     public double getA() {
         return a;
     }
-    
+
     public String getHex() {
-        return (a < 1) ? String.format("#%02x%02x%02x%02x", r, g, b, a * 255) : String.format("#%02x%02x%02x", r, g, b);  
+        return (a < 1) ? String.format("#%02x%02x%02x%02x", r, g, b, a * 255) : String.format("#%02x%02x%02x", r, g, b);
     }
-    
+
 }
