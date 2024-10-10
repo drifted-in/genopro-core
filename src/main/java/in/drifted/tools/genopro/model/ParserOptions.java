@@ -19,27 +19,18 @@ import java.time.LocalDate;
 
 public class ParserOptions {
 
-    private boolean labelsExcluded = false;
-    private boolean shapesExcluded = false;
+    private boolean textLabelsExcluded = false;
     private boolean untitledGenoMapsExcluded = false;
     private boolean unknownIndividualsExcluded = false;
     private boolean hyperlinkedIndividualInstancesDeduplicated = false;
     private LocalDate anonymizedSinceDate = null;
 
-    public boolean hasLabelsExcluded() {
-        return labelsExcluded;
+    public boolean hasTextLabelsExcluded() {
+        return textLabelsExcluded;
     }
 
-    public void setLabelsExcluded(boolean labelsExcluded) {
-        this.labelsExcluded = labelsExcluded;
-    }
-
-    public boolean hasShapesExcluded() {
-        return shapesExcluded;
-    }
-
-    public void setShapesExcluded(boolean shapesExcluded) {
-        this.shapesExcluded = shapesExcluded;
+    public void setTextLabelsExcluded(boolean textLabelsExcluded) {
+        this.textLabelsExcluded = textLabelsExcluded;
     }
 
     public boolean hasUntitledGenoMapsExcluded() {

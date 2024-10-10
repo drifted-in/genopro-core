@@ -58,7 +58,7 @@ public class DataUtil {
                 document, genoMapMap, individualMap, familyPedigreeLinkMap, placeMap);
         Set<Label> labelSet = new HashSet<>();
 
-        if (!parserOptions.hasLabelsExcluded()) {
+        if (!parserOptions.hasTextLabelsExcluded()) {
             labelSet = DataParser.getLabelSet(document, genoMapMap);
         }
 
