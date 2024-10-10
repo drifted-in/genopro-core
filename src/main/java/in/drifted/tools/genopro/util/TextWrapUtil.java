@@ -17,9 +17,10 @@ package in.drifted.tools.genopro.util;
 
 import java.awt.FontMetrics;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class StringUtil {
+public class TextWrapUtil {
 
     public static List<String> getWrappedLineList(String line, int maxWidth, FontMetrics fontMetrics) {
 
@@ -30,26 +31,26 @@ public class StringUtil {
 
         } else {
 
-            String[] words = line.split(" ");
+            List<String> wordList = Arrays.asList(line.split(" "));
 
             int width = 0;
             int startIndex = 0;
 
             int spaceWidth = fontMetrics.stringWidth(" ");
 
-            for (int i = 0; i < words.length; i++) {
-                width += fontMetrics.stringWidth(words[i]);
-                if (i < words.length - 1) {
-                    int nextWidth = fontMetrics.stringWidth(words[i + 1]);
+            for (int i = 0; i < wordList.size(); i++) {
+                width += fontMetrics.stringWidth(wordList.get(i));
+                if (i < wordList.size() - 1) {
+                    int nextWidth = fontMetrics.stringWidth(wordList.get(i + 1));
                     if (width + spaceWidth + nextWidth > maxWidth) {
-                        wrappedLineList.add(getWrappedLine(words, startIndex, i));
+                        wrappedLineList.add(getWrappedLine(wordList, startIndex, i));
                         width = 0;
                         startIndex = i + 1;
                     } else {
                         width += spaceWidth;
                     }
                 } else {
-                    wrappedLineList.add(getWrappedLine(words, startIndex, i));
+                    wrappedLineList.add(getWrappedLine(wordList, startIndex, i));
                 }
             }
         }
@@ -57,15 +58,8 @@ public class StringUtil {
         return wrappedLineList;
     }
 
-    private static String getWrappedLine(String[] words, int startIndex, int endIndex) {
-
-        String wrappedLine = "";
-
-        for (int i = startIndex; i <= endIndex; i++) {
-            wrappedLine += words[i] + " ";
-        }
-
-        return wrappedLine.trim();
+    private static String getWrappedLine(List<String> wordList, int startIndex, int endIndex) {
+        return String.join(" ", wordList.subList(startIndex, endIndex + 1));
     }
 
 }
