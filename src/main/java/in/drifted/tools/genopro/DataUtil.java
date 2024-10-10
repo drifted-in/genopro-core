@@ -28,13 +28,12 @@ import in.drifted.tools.genopro.model.Label;
 import in.drifted.tools.genopro.model.ParserOptions;
 import in.drifted.tools.genopro.model.PedigreeLink;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.w3c.dom.Document;
 
 public class DataUtil {
@@ -54,13 +53,14 @@ public class DataUtil {
         Map<String, GenoMap> genoMapMap = DataParser.getGenoMapMap(document);
         Map<String, String> placeMap = DataParser.getPlaceMap(document);
         Map<String, Individual> individualMap = DataParser.getIndividualMap(document, genoMapMap, parserOptions);
-        Map<String, List<PedigreeLink>> familyPedigreeLinkMap = DataParser.getFamilyPedigreeLinkMap(document, individualMap);
-        Collection<Family> familyCollection = DataParser.getFamilyCollection(document, genoMapMap, individualMap,
-                familyPedigreeLinkMap, placeMap);
-        Collection<Label> labelCollection = new HashSet<>();
+        Map<String, List<PedigreeLink>> familyPedigreeLinkMap = DataParser.getFamilyPedigreeLinkMap(
+                document, individualMap);
+        Set<Family> familySet = DataParser.getFamilySet(
+                document, genoMapMap, individualMap, familyPedigreeLinkMap, placeMap);
+        Set<Label> labelSet = new HashSet<>();
 
         if (!parserOptions.hasLabelsExcluded()) {
-            labelCollection = DataParser.getLabelCollection(document, genoMapMap);
+            labelSet = DataParser.getLabelSet(document, genoMapMap);
         }
 
         if (parserOptions.getHighlightMode() != HighlightMode.NONE) {
@@ -68,7 +68,7 @@ public class DataUtil {
                     familyPedigreeLinkMap);
         }
 
-        Map<GenoMap, Collection<Individual>> genoMapIndividualMap = new HashMap<>();
+        Map<GenoMap, Set<Individual>> genoMapIndividualMap = new HashMap<>();
 
         for (GenoMap genoMap : genoMapMap.values()) {
             genoMapIndividualMap.put(genoMap, new HashSet<>());
@@ -78,23 +78,23 @@ public class DataUtil {
             genoMapIndividualMap.get(individual.getGenoMap()).add(individual);
         }
 
-        Map<GenoMap, Collection<Family>> familyMap = new HashMap<>();
+        Map<GenoMap, Set<Family>> familyMap = new HashMap<>();
 
         for (GenoMap genoMap : genoMapMap.values()) {
             familyMap.put(genoMap, new HashSet<>());
         }
 
-        for (Family family : familyCollection) {
+        for (Family family : familySet) {
             familyMap.get(family.getGenoMap()).add(family);
         }
 
-        Map<GenoMap, Collection<Label>> labelMap = new HashMap<>();
+        Map<GenoMap, Set<Label>> labelMap = new HashMap<>();
 
         for (GenoMap genoMap : genoMapMap.values()) {
             labelMap.put(genoMap, new HashSet<>());
         }
 
-        for (Label label : labelCollection) {
+        for (Label label : labelSet) {
             labelMap.get(label.getGenoMap()).add(label);
         }
 
@@ -130,7 +130,7 @@ public class DataUtil {
 
         for (GenoMapData genoMapData : genoMapDataList) {
 
-            for (Family family : genoMapData.getFamilyCollection()) {
+            for (Family family : genoMapData.getFamilySet()) {
 
                 Individual father = null;
                 Individual mother = null;
@@ -200,7 +200,7 @@ public class DataUtil {
             if (mateMap.containsKey(individualId)) {
 
                 List<Individual> mateList = mateMap.get(individualId);
-                Collections.sort(mateList, individual.isMale() ? maleComparator : femaleComparator);
+                mateList.sort(individual.isMale() ? maleComparator : femaleComparator);
 
                 for (Individual mate : mateList) {
                     mateIdList.add(mate.getId());

@@ -46,7 +46,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -172,9 +171,9 @@ public class DataParser {
 
         Map<String, Individual> individualMap = new HashMap<>();
 
-        Collection<Individual> individualCollection = getIndividualCollection(document, genoMapMap, parserOptions);
+        Set<Individual> individualSet = getIndividualSet(document, genoMapMap, parserOptions);
 
-        for (Individual individual : individualCollection) {
+        for (Individual individual : individualSet) {
             individualMap.put(individual.getId(), individual);
         }
 
@@ -182,18 +181,18 @@ public class DataParser {
     }
 
     /**
-     * Returns the collection of all individuals. The list can be pre-filtered
+     * Returns the set of all individuals. The list can be pre-filtered
      * if additional options are specified.
      *
      * @param document GenoPro XML document
      * @param genoMapMap map of all GenoMaps
      * @param parserOptions parser options
-     * @return the collection of all individuals
+     * @return the set of all individuals
      */
-    public static Collection<Individual> getIndividualCollection(Document document, Map<String, GenoMap> genoMapMap,
+    public static Set<Individual> getIndividualSet(Document document, Map<String, GenoMap> genoMapMap,
             ParserOptions parserOptions) {
 
-        Collection<Individual> individualCollection = new HashSet<>();
+        Set<Individual> individualSet = new HashSet<>();
 
         NodeList nodeList = document.getElementsByTagName("Individual");
 
@@ -202,30 +201,30 @@ public class DataParser {
             Individual individual = getIndividual(genoMapMap, (Element) nodeList.item(i));
 
             if (!(individual.getName() == null && parserOptions.hasUnknownIndividualsExcluded())) {
-                individualCollection.add(individual);
+                individualSet.add(individual);
             }
         }
 
         if (parserOptions.hasHyperlinkedIndividualInstancesDeduplicated()) {
-            individualCollection = getDeduplicatedIndividualCollection(individualCollection, parserOptions);
+            individualSet = getDeduplicatedIndividualSet(individualSet, parserOptions);
         }
 
         if (parserOptions.getAnonymizedSinceDate() != null) {
-            individualCollection = getAnonymizedIndividualCollection(individualCollection, parserOptions);
+            individualSet = getAnonymizedIndividualSet(individualSet, parserOptions);
         }
 
-        return individualCollection;
+        return individualSet;
     }
 
-    private static Collection<Individual> getDeduplicatedIndividualCollection(Collection<Individual> individualCollection,
+    private static Set<Individual> getDeduplicatedIndividualSet(Set<Individual> individualSet,
             ParserOptions parserOptions) {
 
-        Collection<Individual> deduplicatedIndividualCollection = new HashSet<>();
+        Set<Individual> deduplicatedIndividualSet = new HashSet<>();
 
         Map<String, Individual> individualMap = new HashMap<>();
         Map<String, String> hyperlinkMap = new HashMap<>();
 
-        for (Individual individual : individualCollection) {
+        for (Individual individual : individualSet) {
 
             individualMap.put(individual.getId(), individual);
 
@@ -253,77 +252,77 @@ public class DataParser {
                 }
 
                 if (individual.getHyperlink() == null) {
-                    deduplicatedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(),
+                    deduplicatedIndividualSet.add(new Individual(individual.getId(), individual.getGenoMap(),
                             hyperlink, individual.getName(), individual.getGender(), individual.getBirth(),
                             individual.getDeath(), individual.isDead(), false, individual.getPosition(),
                             individual.getBoundaryRect(), individual.getHighlightKeySet()));
 
                 } else {
-                    deduplicatedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(),
+                    deduplicatedIndividualSet.add(new Individual(individual.getId(), individual.getGenoMap(),
                             hyperlink, targetIndividual.getName(), targetIndividual.getGender(),
                             targetIndividual.getBirth(), targetIndividual.getDeath(), targetIndividual.isDead(), false,
                             individual.getPosition(), individual.getBoundaryRect(), individual.getHighlightKeySet()));
                 }
 
             } else {
-                deduplicatedIndividualCollection.add(individual);
+                deduplicatedIndividualSet.add(individual);
             }
         }
 
-        return deduplicatedIndividualCollection;
+        return deduplicatedIndividualSet;
     }
 
-    private static Collection<Individual> getAnonymizedIndividualCollection(Collection<Individual> individualCollection,
+    private static Set<Individual> getAnonymizedIndividualSet(Set<Individual> individualSet,
             ParserOptions parserOptions) {
 
-        Collection<Individual> anonymizedIndividualCollection = new HashSet<>();
+        Set<Individual> anonymizedIndividualSet = new HashSet<>();
 
         LocalDate anonymizedSinceLocalDate = parserOptions.getAnonymizedSinceDate();
 
         boolean anonymizeDatesOnly = anonymizedSinceLocalDate.equals(LocalDate.now());
 
-        for (Individual individual : individualCollection) {
+        for (Individual individual : individualSet) {
 
             if (individual.isDead() || (!anonymizeDatesOnly
                     && individual.getBirth() != null
                     && individual.getBirth().hasDate()
                     && individual.getBirth().getDate().getLocalDate().isBefore(anonymizedSinceLocalDate))) {
 
-                anonymizedIndividualCollection.add(individual);
+                anonymizedIndividualSet.add(individual);
 
             } else {
                 if (anonymizeDatesOnly) {
-                    anonymizedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(),
+                    anonymizedIndividualSet.add(new Individual(individual.getId(), individual.getGenoMap(),
                             individual.getHyperlink(), individual.getName(), individual.getGender(), null, null, false,
                             false, individual.getPosition(), individual.getBoundaryRect(),
                             individual.getHighlightKeySet()));
 
                 } else {
-                    anonymizedIndividualCollection.add(new Individual(individual.getId(), individual.getGenoMap(),
+                    anonymizedIndividualSet.add(new Individual(individual.getId(), individual.getGenoMap(),
                             null, null, individual.getGender(), null, null, false, true, individual.getPosition(),
                             individual.getBoundaryRect(), individual.getHighlightKeySet()));
                 }
             }
         }
 
-        return anonymizedIndividualCollection;
+        return anonymizedIndividualSet;
     }
 
     /**
-     * Returns the collection of all families together with the pedigree links.
+     * Returns the set of all families together with the pedigree links.
      *
      * @param document GenoPro XML document
      * @param genoMapMap map of all GenoMaps
      * @param individualMap map of all individuals
      * @param familyPedigreeLinkMap map of family pedigree links
      * @param placeMap map of all places
-     * @return the collection of all families
+     * @return the set of all families
      */
-    public static Collection<Family> getFamilyCollection(Document document, Map<String, GenoMap> genoMapMap,
+    public static Set<Family> getFamilySet(Document document, Map<String, GenoMap> genoMapMap,
             Map<String, Individual> individualMap, Map<String, List<PedigreeLink>> familyPedigreeLinkMap,
             Map<String, String> placeMap) {
 
-        Collection<Family> familyCollection = new HashSet<>();
+        Set<Family> familySet = new HashSet<>();
 
         Map<String, FamilyEvent> marriageMap = getMarriageMap(document, placeMap);
 
@@ -348,104 +347,110 @@ public class DataParser {
 
             String familyId = familyElement.getAttribute("ID");
 
-            List<PedigreeLink> pedigreeLinkList = familyPedigreeLinkMap.get(familyId);
+            if (familyPedigreeLinkMap.containsKey(familyId)) {
 
-            String fatherId = null;
-            String motherId = null;
+                List<PedigreeLink> pedigreeLinkList = familyPedigreeLinkMap.get(familyId);
 
-            for (PedigreeLink pedigreeLink : pedigreeLinkList) {
+                String fatherId = null;
+                String motherId = null;
 
-                if (pedigreeLink.isParent()) {
-
-                    Individual individual = individualMap.get(pedigreeLink.getIndividualId());
-
-                    if (individual.isMale()) {
-                        fatherId = individual.getId();
-
-                    } else if (individual.isFemale()) {
-                        motherId = individual.getId();
-                    }
-                }
-            }
-
-            boolean isParentAnonymized = false;
-
-            for (PedigreeLink pedigreeLink : pedigreeLinkList) {
-
-                if (pedigreeLink.isParent()) {
-
-                    Individual individual = individualMap.get(pedigreeLink.getIndividualId());
-
-                    if (individual.isAnonymized()) {
-                        isParentAnonymized = true;
-                        break;
-                    }
-                }
-            }
-
-            boolean isChildAnonymized = false;
-
-            for (PedigreeLink pedigreeLink : pedigreeLinkList) {
-                if (!pedigreeLink.isParent()) {
-                    if (individualMap.get(pedigreeLink.getIndividualId()).isAnonymized()) {
-                        isChildAnonymized = true;
-                        break;
-                    }
-                }
-            }
-
-            boolean hasChildren = false;
-
-            for (PedigreeLink pedigreeLink : pedigreeLinkList) {
-                if (!pedigreeLink.isParent()) {
-                    hasChildren = true;
-                    break;
-                }
-            }
-
-            List<PedigreeLink> childlessPedigreeLinkList = new ArrayList<>();
-
-            if (!isParentAnonymized && hasChildren && isChildAnonymized) {
                 for (PedigreeLink pedigreeLink : pedigreeLinkList) {
+
                     if (pedigreeLink.isParent()) {
-                        childlessPedigreeLinkList.add(pedigreeLink);
+
+                        Individual individual = individualMap.get(pedigreeLink.getIndividualId());
+
+                        if (individual.isMale()) {
+                            fatherId = individual.getId();
+
+                        } else if (individual.isFemale()) {
+                            motherId = individual.getId();
+                        }
                     }
                 }
 
-                pedigreeLinkList = childlessPedigreeLinkList;
-            }
+                boolean isParentAnonymized = false;
 
-            if (!(isParentAnonymized && !hasChildren) && !(isParentAnonymized && hasChildren && isChildAnonymized)) {
+                for (PedigreeLink pedigreeLink : pedigreeLinkList) {
 
-                String label = familyNodeValueMap.get("DisplayText");
-                FamilyLineType familyLineType = FamilyLineType.parse(familyNodeValueMap.get("FamilyLine"));
-                FamilyRelationType relationType = FamilyRelationType.parse(familyNodeValueMap.get("Relation"));
-                Element positionElement = (Element) getSingleNode(familyElement, "Position");
-                GenoMap genoMap = getGenoMap(genoMapMap, positionElement.getAttribute("GenoMap"));
-                Position position = getPosition(positionElement.getFirstChild().getTextContent().trim());
+                    if (pedigreeLink.isParent()) {
 
-                BoundaryRect topBoundaryRect = null;
-                Node topNode = getSingleNode(positionElement, "Top");
-                if (topNode != null) {
-                    Map<String, String> topNodeValueMap = getNodeValueMap(topNode);
-                    topBoundaryRect = getBoundaryRect(topNodeValueMap.get("Left") + "," + topNodeValueMap.get("Right"));
+                        Individual individual = individualMap.get(pedigreeLink.getIndividualId());
+
+                        if (individual.isAnonymized()) {
+                            isParentAnonymized = true;
+                            break;
+                        }
+                    }
                 }
 
-                BoundaryRect bottomBoundaryRect = null;
-                Node bottomNode = getSingleNode(positionElement, "Bottom");
-                if (bottomNode != null) {
-                    Map<String, String> bottomNodeValueMap = getNodeValueMap(bottomNode);
-                    bottomBoundaryRect = getBoundaryRect(bottomNodeValueMap.get("Left") + ","
-                            + bottomNodeValueMap.get("Right"));
+                boolean isChildAnonymized = false;
+
+                for (PedigreeLink pedigreeLink : pedigreeLinkList) {
+                    if (!pedigreeLink.isParent()) {
+                        if (individualMap.get(pedigreeLink.getIndividualId()).isAnonymized()) {
+                            isChildAnonymized = true;
+                            break;
+                        }
+                    }
                 }
 
-                familyCollection.add(new Family(familyId, fatherId, motherId, genoMap, label, relationType,
-                        familyLineType, familyEventList, pedigreeLinkList, position, topBoundaryRect,
-                        bottomBoundaryRect));
+                boolean hasChildren = false;
+
+                for (PedigreeLink pedigreeLink : pedigreeLinkList) {
+                    if (!pedigreeLink.isParent()) {
+                        hasChildren = true;
+                        break;
+                    }
+                }
+
+                List<PedigreeLink> childlessPedigreeLinkList = new ArrayList<>();
+
+                if (!isParentAnonymized && hasChildren && isChildAnonymized) {
+                    for (PedigreeLink pedigreeLink : pedigreeLinkList) {
+                        if (pedigreeLink.isParent()) {
+                            childlessPedigreeLinkList.add(pedigreeLink);
+                        }
+                    }
+
+                    pedigreeLinkList = childlessPedigreeLinkList;
+                }
+
+                if (!(isParentAnonymized && !hasChildren) && !(isParentAnonymized && hasChildren && isChildAnonymized)) {
+
+                    String label = familyNodeValueMap.get("DisplayText");
+                    FamilyLineType familyLineType = FamilyLineType.parse(familyNodeValueMap.get("FamilyLine"));
+                    FamilyRelationType relationType = FamilyRelationType.parse(familyNodeValueMap.get("Relation"));
+                    Element positionElement = (Element) getSingleNode(familyElement, "Position");
+                    GenoMap genoMap = getGenoMap(genoMapMap, positionElement.getAttribute("GenoMap"));
+                    Position position = getPosition(positionElement.getFirstChild().getTextContent().trim());
+
+                    BoundaryRect topBoundaryRect = null;
+                    Node topNode = getSingleNode(positionElement, "Top");
+                    if (topNode != null) {
+                        Map<String, String> topNodeValueMap = getNodeValueMap(topNode);
+                        topBoundaryRect = getBoundaryRect(topNodeValueMap.get("Left") + "," + topNodeValueMap.get("Right"));
+                    }
+
+                    BoundaryRect bottomBoundaryRect = null;
+                    Node bottomNode = getSingleNode(positionElement, "Bottom");
+                    if (bottomNode != null) {
+                        Map<String, String> bottomNodeValueMap = getNodeValueMap(bottomNode);
+                        bottomBoundaryRect = getBoundaryRect(bottomNodeValueMap.get("Left") + ","
+                                + bottomNodeValueMap.get("Right"));
+                    }
+
+                    familySet.add(new Family(familyId, fatherId, motherId, genoMap, label, relationType,
+                            familyLineType, familyEventList, pedigreeLinkList, position, topBoundaryRect,
+                            bottomBoundaryRect));
+                }
+
+            } else {
+                System.out.println("Family not found: " + familyId);
             }
         }
 
-        return familyCollection;
+        return familySet;
     }
 
     /**
@@ -553,9 +558,9 @@ public class DataParser {
         return twinPositionMap;
     }
 
-    public static Collection<Label> getLabelCollection(Document document, Map<String, GenoMap> genoMapMap) {
+    public static Set<Label> getLabelSet(Document document, Map<String, GenoMap> genoMapMap) {
 
-        Collection<Label> labelCollection = new HashSet<>();
+        Set<Label> labelSet = new HashSet<>();
 
         Element labelsElement = (Element) getSingleNode(document.getDocumentElement(), "Labels");
 
@@ -606,11 +611,11 @@ public class DataParser {
 
                 LabelStyle labelStyle = new LabelStyle(textSize, horizontalAlignment, verticalAlignment, padding,
                         textColor, fillColor, border);
-                labelCollection.add(new Label(genoMap, text, rect, zIndex, labelStyle));
+                labelSet.add(new Label(genoMap, text, rect, zIndex, labelStyle));
             }
         }
 
-        return labelCollection;
+        return labelSet;
     }
 
     private static Individual getIndividual(Map<String, GenoMap> genoMapMap, Element individualElement) {
