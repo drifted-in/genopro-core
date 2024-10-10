@@ -7,9 +7,9 @@ It is possible to create custom reports, but:
 - they have to be written in Visual Basic script
 - they have to be executed in GenoPro as they rely on some internal objects
 
-For one very specific report I've used Java for parsing data directly from GNO files. Later on I've used improved parser
-for another report. I've realized it would be helpful to transform my code into lightweight library which could be used
-by anybody.
+A long time ago, for one particular report, I used Java to parse data directly from GNO files. Later on, I used
+an improved parser for another report. I've realized it would be helpful to transform my code into a lightweight
+library that anybody could reuse.
 
 ## Limitations
 
@@ -17,55 +17,48 @@ This library covers just a limited subset of GNO file format capabilities. Curre
 - basic genomaps details
 - basic individual details
 - basic family relation details
+- basic text label details
 
 ## Parsing options
 
 There are several parser options available for specific needs:
 
-- `excludeUntitledGenoMaps` - use `true` to exclude GenoMaps without a title (the GenoMap title is not the name, it can
-  be specified in GenoMap properties, by default it is empty). This is handy when some stuff needs to be hidden in your
-  report. It can be moved to dedicated GenoMaps which titles are left empty.
+- `untitledGenoMapsExcluded` - use `true` to exclude GenoMaps without a title (the GenoMap title is not the name,
+  it can be specified in GenoMap properties, but by default it is empty). This is handy when some stuff needs to be
+  hidden in your report. It can be moved to dedicated GenoMaps which titles are left empty.
 
-- `excludeUnknownIndividuals` - use `true` to parse details about individuals without name.
+- `unknownIndividualsExcluded` - use `true` to exclude individuals without name.
 
-- `resolveHyperlinks` - use `true` to retrieve hyperlink details (if there are multiple instances of the specific
-  individual on multiple hyperlinked GenoMaps and there is a need to work with this data). If the hyperlink points to
-  an untitled GenoMap and the `excludeUntitledGenoMaps` option is set to `true`, the hyperlink is ignored.
+- `hyperlinkedIndividualInstancesDeduplicated` - use `true` to deduplicate individual instances present on multiple
+  GenoMaps, mutually hyperlinked, if there is a need to work with merged data. When the `excludeUntitledGenoMaps`
+  option is set to `true` and any individual instance is located on an untitled GenoMaps, its details are ignored.
+
+- `textLabelsExcluded` - use `true` to exclude text labels.
 
 - `anonymizedSinceDate` - use specific date, current date or `NULL` to select the desired anonymization mode,
   see the Anonymization section.
 
-- `highlightMode` - use `1` for highlighting paternal or `2` for maternal lines, see the Highlighting section.
-
 ## Anonymization
 
 In common use cases the original data needs to be anonymized. While it can be done after retrieving all data, a basic
-anonymization is available out-of-the-box.
+anonymization is available out of the box.
 
-Currently 2 anonymization modes are available. The mode is determined from passed date parameter. If date is `NULL` or
-future date, the anonymization is disabled completely.
+### Strict mode (skip uncertain data)
 
-### Suppressing uncertain data
+Set the specific date in the past to ensure:
+- only those guaranteed not living individuals on the given date are kept
+ (those without birth and death details are excluded automatically)
+- only those parent/child pedigree links are kept if none of family members is anonymized
 
-If the specific date in past is provided:
+### Lenient mode (keep uncertain data but clear dates)
 
-- Individuals are kept if deceased or born before the specified date (only if a birth date is known).
-- Parents relations are kept if none of parents is anonymized.
-- Children relations are kept if none of children is anonymized.
+Set the current date (year) to ensure:
+- all individuals and their pedigree links are kept, but birth and death dates of those uncertain individuals
+  are cleared.
 
-### Suppressing date values of living individuals
+### Unrestricted mode (no anonymization)
 
-If the current date is provided, all individuals and families are kept, but date values are cleared for all living
-individuals.
-
-## Highlighting
-
-Highlighting comes in handy in advanced outputs. Originally it was intended for visual tracking of certain DNA
-mutations. If specific mutation is shared by multiple individuals and these individuals are linked together in the
-family tree, we can determine the common ancestor of this mutation. Technically these mutations are visualized by unique
-colors applied to the gender symbol of tested individuals. If highlighting is enabled, these colors are spread and
-combined upstream automatically. The final highlighting hints can be then used by renderers to visualize trees
-accordingly without the need of additional pre-processing.
+Left the parameter unset or set the future date to disable anonymization.
 
 ## The list of reports based on this library
 
