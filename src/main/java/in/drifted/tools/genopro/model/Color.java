@@ -33,12 +33,19 @@ public class Color {
         this.a = a;
     }
 
-    public Color(String hex) {
-        this(
-                Integer.valueOf(hex.substring(1, 3), 16),
-                Integer.valueOf(hex.substring(3, 5), 16),
-                Integer.valueOf(hex.substring(5, 7), 16),
-                (hex.length() == 9) ? Integer.valueOf(hex.substring(7, 9), 16) / 255 : 1.0);
+    public static Color fromHex(String hex) {
+        if (hex == null) {
+            return new Color(0, 0, 0);
+        } else if (hex.equals("Transparent")) {
+            return new Color(255, 255, 255, 0);
+        } else {
+            return new Color(
+                    Integer.parseInt(hex.substring(1, 3), 16),
+                    Integer.parseInt(hex.substring(3, 5), 16),
+                    Integer.parseInt(hex.substring(5, 7), 16),
+                    (hex.length() == 9) ? Integer.parseInt(hex.substring(7, 9), 16) / 255.0 : 1.0
+            );
+        }
     }
 
     @Override

@@ -594,9 +594,9 @@ public class DataParser {
                 int padding = Integer.parseInt(textElement.getAttribute("Padding"));
 
                 Element colorElement = (Element) getSingleNode(labelElement, "Color");
-                Color textColor = getColor(colorElement.getAttribute("Text"));
-                Color fillColor = getColor(colorElement.getAttribute("Fill"));
-                Color borderColor = getColor(colorElement.getAttribute("Border"));
+                Color textColor = Color.fromHex(colorElement.getAttribute("Text"));
+                Color fillColor = Color.fromHex(colorElement.getAttribute("Fill"));
+                Color borderColor = Color.fromHex(colorElement.getAttribute("Border"));
 
                 Element borderElement = (Element) getSingleNode(labelElement, "Border");
                 Size borderSize = textSize;
@@ -790,15 +790,6 @@ public class DataParser {
             }
         }
         return defaultAlignment;
-    }
-
-    private static Color getColor(String color) {
-
-        if (color == null) {
-            return new Color(0, 0, 0);
-        } else {
-            return new Color(color);
-        }
     }
 
     private static Set<String> getHighlightKeySet(Element individualElement) {
