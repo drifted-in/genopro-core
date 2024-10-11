@@ -632,12 +632,12 @@ public class DocumentParser {
         Map<String, String> individualNodeValueMap = getNodeValueMap(individualElement);
 
         Gender gender = Gender.parse(individualNodeValueMap.get("Gender"));
-        boolean isDead = false;
+        boolean isDeceased = false;
 
-        String isDeadValue = individualNodeValueMap.get("IsDead");
+        String isDeceasedValue = individualNodeValueMap.get("IsDead");
 
-        if (isDeadValue != null) {
-            isDead = isDeadValue.equals("Y");
+        if (isDeceasedValue != null) {
+            isDeceased = isDeceasedValue.equals("Y");
         }
 
         Element positionElement = (Element) getSingleNode(individualElement, "Position");
@@ -648,7 +648,7 @@ public class DocumentParser {
         Set<String> highlightKeySet = getHighlightKeySet(individualElement);
 
         return new Individual(id, key, genoMap, hyperlink.isEmpty() ? null : new Hyperlink(null, hyperlink),
-                name, gender, birth, death, isDead, false, position, boundaryRect, highlightKeySet);
+                name, gender, birth, death, isDeceased, false, position, boundaryRect, highlightKeySet);
     }
 
     private static GenoMap getGenoMap(Map<String, GenoMap> genoMapMap, String genoMapName) {
