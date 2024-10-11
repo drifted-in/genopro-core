@@ -160,13 +160,13 @@ public class DocumentParser {
      * Returns the map of all individuals. The map can be pre-filtered if
      * additional options are specified.
      *
-     * @param document GenoPro XML document
-     * @param genoMapMap map of all GenoMaps
-     * @param documentParserOptions parser options
+     * @param document              GenoPro XML document
+     * @param genoMapMap            map of all GenoMaps
+     * @param documentParserOptions document parser options
      * @return the map of all individuals
      */
-    public static Map<String, Individual> getIndividualMap(Document document, Map<String, GenoMap> genoMapMap,
-            DocumentParserOptions documentParserOptions) {
+    public static Map<String, Individual> getIndividualMap(
+            Document document, Map<String, GenoMap> genoMapMap, DocumentParserOptions documentParserOptions) {
 
         Map<String, Individual> individualMap = new HashMap<>();
 
@@ -183,13 +183,13 @@ public class DocumentParser {
      * Returns the set of all individuals. The list can be pre-filtered
      * if additional options are specified.
      *
-     * @param document GenoPro XML document
-     * @param genoMapMap map of all GenoMaps
-     * @param documentParserOptions parser options
+     * @param document              GenoPro XML document
+     * @param genoMapMap            map of all GenoMaps
+     * @param documentParserOptions document parser options
      * @return the set of all individuals
      */
-    public static Set<Individual> getIndividualSet(Document document, Map<String, GenoMap> genoMapMap,
-            DocumentParserOptions documentParserOptions) {
+    public static Set<Individual> getIndividualSet(
+            Document document, Map<String, GenoMap> genoMapMap, DocumentParserOptions documentParserOptions) {
 
         Set<Individual> individualSet = new HashSet<>();
 
@@ -215,8 +215,8 @@ public class DocumentParser {
         return individualSet;
     }
 
-    private static Set<Individual> getDeduplicatedIndividualSet(Set<Individual> individualSet,
-            DocumentParserOptions documentParserOptions) {
+    private static Set<Individual> getDeduplicatedIndividualSet(
+            Set<Individual> individualSet, DocumentParserOptions documentParserOptions) {
 
         Set<Individual> deduplicatedIndividualSet = new HashSet<>();
 
@@ -271,8 +271,8 @@ public class DocumentParser {
         return deduplicatedIndividualSet;
     }
 
-    private static Set<Individual> getAnonymizedIndividualSet(Set<Individual> individualSet,
-            DocumentParserOptions documentParserOptions) {
+    private static Set<Individual> getAnonymizedIndividualSet(
+            Set<Individual> individualSet, DocumentParserOptions documentParserOptions) {
 
         Set<Individual> anonymizedIndividualSet = new HashSet<>();
 
@@ -310,16 +310,16 @@ public class DocumentParser {
     /**
      * Returns the set of all families together with the pedigree links.
      *
-     * @param document GenoPro XML document
-     * @param genoMapMap map of all GenoMaps
-     * @param individualMap map of all individuals
+     * @param document              GenoPro XML document
+     * @param genoMapMap            map of all GenoMaps
+     * @param individualMap         map of all individuals
      * @param familyPedigreeLinkMap map of family pedigree links
-     * @param placeMap map of all places
+     * @param placeMap              map of all places
      * @return the set of all families
      */
-    public static Set<Family> getFamilySet(Document document, Map<String, GenoMap> genoMapMap,
-            Map<String, Individual> individualMap, Map<String, List<PedigreeLink>> familyPedigreeLinkMap,
-            Map<String, String> placeMap) {
+    public static Set<Family> getFamilySet(
+            Document document, Map<String, GenoMap> genoMapMap, Map<String, Individual> individualMap,
+            Map<String, List<PedigreeLink>> familyPedigreeLinkMap, Map<String, String> placeMap) {
 
         Set<Family> familySet = new HashSet<>();
 
@@ -455,12 +455,12 @@ public class DocumentParser {
     /**
      * Returns the map of pedigree links for all families.
      *
-     * @param document GenoPro XML document
+     * @param document      GenoPro XML document
      * @param individualMap map of all individuals
-     * @return a¨the map of family pedigree links for all families
+     * @return the map of family pedigree links for all families
      */
-    public static Map<String, List<PedigreeLink>> getFamilyPedigreeLinkMap(Document document,
-            Map<String, Individual> individualMap) {
+    public static Map<String, List<PedigreeLink>> getFamilyPedigreeLinkMap(
+            Document document, Map<String, Individual> individualMap) {
 
         Map<String, List<PedigreeLink>> familyPedigreeLinkMap = new HashMap<>();
 
@@ -520,6 +520,12 @@ public class DocumentParser {
         return marriageMap;
     }
 
+    /**
+     * Returns the map of all places
+     *
+     * @param document GenoPro XML document
+     * @return the map of all places
+     */
     public static Map<String, String> getPlaceMap(Document document) {
 
         Map<String, String> placeMap = new HashMap<>();
@@ -557,6 +563,13 @@ public class DocumentParser {
         return twinPositionMap;
     }
 
+    /**
+     * Returns the set of all labels
+     *
+     * @param document   GenoPro XML document
+     * @param genoMapMap map of all GenoMaps
+     * @return the set of all labels
+     */
     public static Set<Label> getLabelSet(Document document, Map<String, GenoMap> genoMapMap) {
 
         Set<Label> labelSet = new HashSet<>();
