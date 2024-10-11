@@ -34,8 +34,6 @@ public class BasicAgeFormatter implements AgeFormatter {
     @Override
     public String format(Birth birth, Death death) {
 
-        String age = null;
-
         if (birth != null && birth.hasDate()) {
 
             Period period;
@@ -47,30 +45,35 @@ public class BasicAgeFormatter implements AgeFormatter {
                 period = Period.between(birth.date().localDate(), LocalDate.now());
             }
 
-            StringBuilder ageBuilder = new StringBuilder();
-
-            int years = period.getYears();
-
-            if (years > 0) {
-                ageBuilder.append(years);
-
-            } else {
-                int months = period.getMonths();
-
-                if (months > 0) {
-                    ageBuilder.append(months);
-                    ageBuilder.append(monthAbbrev);
-
-                } else {
-                    ageBuilder.append(period.getDays());
-                    ageBuilder.append(dayAbbrev);
-                }
-            }
-
-            age = ageBuilder.toString();
+            return getFormattedAge(period);
         }
 
-        return age;
+        return null;
+    }
+
+    private String getFormattedAge(Period period) {
+
+        StringBuilder formattedAgeBuilder = new StringBuilder();
+
+        int years = period.getYears();
+
+        if (years > 0) {
+            formattedAgeBuilder.append(years);
+
+        } else {
+            int months = period.getMonths();
+
+            if (months > 0) {
+                formattedAgeBuilder.append(months);
+                formattedAgeBuilder.append(monthAbbrev);
+
+            } else {
+                formattedAgeBuilder.append(period.getDays());
+                formattedAgeBuilder.append(dayAbbrev);
+            }
+        }
+
+        return formattedAgeBuilder.toString();
     }
 
 }
