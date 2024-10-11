@@ -41,10 +41,10 @@ public class BasicAgeFormatter implements AgeFormatter {
             Period period;
 
             if (death != null && death.hasDate()) {
-                period = Period.between(birth.getDate().getLocalDate(), death.getDate().getLocalDate());
+                period = Period.between(birth.date().localDate(), death.date().localDate());
 
             } else {
-                period = Period.between(birth.getDate().getLocalDate(), LocalDate.now());
+                period = Period.between(birth.date().localDate(), LocalDate.now());
             }
 
             StringBuilder ageBuilder = new StringBuilder();

@@ -15,18 +15,18 @@
  */
 package in.drifted.tools.genopro.util;
 
-import in.drifted.tools.genopro.parser.DocumentParser;
-import in.drifted.tools.genopro.util.formatter.DateFormatter;
 import in.drifted.tools.genopro.model.EventDate;
 import in.drifted.tools.genopro.model.Family;
 import in.drifted.tools.genopro.model.FamilyRelation;
 import in.drifted.tools.genopro.model.GenoMap;
 import in.drifted.tools.genopro.model.GenoMapData;
-import in.drifted.tools.genopro.util.comparator.IndividualHorizontalPositionComparator;
 import in.drifted.tools.genopro.model.Individual;
 import in.drifted.tools.genopro.model.Label;
-import in.drifted.tools.genopro.parser.DocumentParserOptions;
 import in.drifted.tools.genopro.model.PedigreeLink;
+import in.drifted.tools.genopro.parser.DocumentParser;
+import in.drifted.tools.genopro.parser.DocumentParserOptions;
+import in.drifted.tools.genopro.util.comparator.IndividualHorizontalPositionComparator;
+import in.drifted.tools.genopro.util.formatter.DateFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -70,7 +70,7 @@ public class DocumentDataUtil {
         }
 
         for (Individual individual : individualMap.values()) {
-            genoMapIndividualMap.get(individual.getGenoMap()).add(individual);
+            genoMapIndividualMap.get(individual.genoMap()).add(individual);
         }
 
         Map<GenoMap, Set<Family>> familyMap = new HashMap<>();
@@ -80,7 +80,7 @@ public class DocumentDataUtil {
         }
 
         for (Family family : familySet) {
-            familyMap.get(family.getGenoMap()).add(family);
+            familyMap.get(family.genoMap()).add(family);
         }
 
         Map<GenoMap, Set<Label>> labelMap = new HashMap<>();
@@ -90,11 +90,11 @@ public class DocumentDataUtil {
         }
 
         for (Label label : labelSet) {
-            labelMap.get(label.getGenoMap()).add(label);
+            labelMap.get(label.genoMap()).add(label);
         }
 
         for (GenoMap genoMap : genoMapMap.values()) {
-            if (!(genoMap.getTitle() == null && documentParserOptions.hasUntitledGenoMapsExcluded())) {
+            if (!(genoMap.title() == null && documentParserOptions.hasUntitledGenoMapsExcluded())) {
                 genoMapDataList.add(new GenoMapData(genoMap, genoMapIndividualMap.get(genoMap),
                         familyMap.get(genoMap), labelMap.get(genoMap)));
             }
@@ -125,16 +125,16 @@ public class DocumentDataUtil {
 
         for (GenoMapData genoMapData : genoMapDataList) {
 
-            for (Family family : genoMapData.getFamilySet()) {
+            for (Family family : genoMapData.familySet()) {
 
                 Individual father = null;
                 Individual mother = null;
 
-                for (PedigreeLink pedigreeLink : family.getPedigreeLinkList()) {
+                for (PedigreeLink pedigreeLink : family.pedigreeLinkList()) {
 
                     if (pedigreeLink.isParent()) {
 
-                        String individualId = pedigreeLink.getIndividualId();
+                        String individualId = pedigreeLink.individualId();
                         Individual individual = individualMap.get(individualId);
 
                         if (individual != null) {
@@ -147,13 +147,13 @@ public class DocumentDataUtil {
                     }
                 }
 
-                for (PedigreeLink pedigreeLink : family.getPedigreeLinkList()) {
+                for (PedigreeLink pedigreeLink : family.pedigreeLinkList()) {
 
-                    String individualId = pedigreeLink.getIndividualId();
+                    String individualId = pedigreeLink.individualId();
 
                     if (pedigreeLink.isParent()) {
 
-                        if (father != null && father.getId().equals(individualId)) {
+                        if (father != null && father.id().equals(individualId)) {
                             if (!mateMap.containsKey(individualId)) {
                                 mateMap.put(individualId, new ArrayList<>());
                             }
@@ -164,7 +164,7 @@ public class DocumentDataUtil {
                             }
                         }
 
-                        if (mother != null && mother.getId().equals(individualId)) {
+                        if (mother != null && mother.id().equals(individualId)) {
                             if (!mateMap.containsKey(individualId)) {
                                 mateMap.put(individualId, new ArrayList<>());
                             }
@@ -177,10 +177,10 @@ public class DocumentDataUtil {
 
                     } else {
                         if (father != null) {
-                            fatherMap.put(individualId, father.getId());
+                            fatherMap.put(individualId, father.id());
                         }
                         if (mother != null) {
-                            motherMap.put(individualId, mother.getId());
+                            motherMap.put(individualId, mother.id());
                         }
                     }
                 }
@@ -189,7 +189,7 @@ public class DocumentDataUtil {
 
         for (Individual individual : individualMap.values()) {
 
-            String individualId = individual.getId();
+            String individualId = individual.id();
             List<String> mateIdList = new ArrayList<>();
 
             if (mateMap.containsKey(individualId)) {
@@ -198,7 +198,7 @@ public class DocumentDataUtil {
                 mateList.sort(individual.isMale() ? maleComparator : femaleComparator);
 
                 for (Individual mate : mateList) {
-                    mateIdList.add(mate.getId());
+                    mateIdList.add(mate.id());
                 }
             }
 
@@ -221,7 +221,7 @@ public class DocumentDataUtil {
         String formattedDate = "";
 
         if (date != null && date.hasDate()) {
-            formattedDate = date.getDate().getDate(dateFormatter);
+            formattedDate = date.date().getDate(dateFormatter);
         }
 
         return formattedDate;

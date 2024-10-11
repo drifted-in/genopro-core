@@ -15,29 +15,11 @@
  */
 package in.drifted.tools.genopro.model;
 
-public class Death implements EventDate {
-
-    private final GenoDate date;
-    private final String comment;
-
-    public Death(GenoDate date, String comment) {
-        this.date = date;
-        this.comment = comment;
-    }
+public record Death(GenoDate date, String comment) implements EventDate {
 
     @Override
     public boolean hasDate() {
-        return date != null && date.getDate() != null;
-    }
-
-    @Override
-    public GenoDate getDate() {
-        return date;
-    }
-
-    @Override
-    public String getComment() {
-        return comment;
+        return date != null && date.date() != null;
     }
 
 }

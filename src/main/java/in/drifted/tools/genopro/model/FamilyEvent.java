@@ -15,37 +15,9 @@
  */
 package in.drifted.tools.genopro.model;
 
-public class FamilyEvent {
+public record FamilyEvent(int type, GenoDate date, String place, String comment) {
 
     public static final int MARRIAGE = 0;
     public static final int DIVORCE = 1;
-
-    private final int type;
-    private final GenoDate date;
-    private final String place;
-    private final String comment;
-
-    public FamilyEvent(int type, GenoDate date, String place, String comment) {
-        this.type = type;
-        this.date = date;
-        this.place = place;
-        this.comment = comment;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public GenoDate getDate() {
-        return date;
-    }
-
-    public String getPlace() {
-        return place;
-    }
-
-    public String getComment() {
-        return comment;
-    }
 
 }

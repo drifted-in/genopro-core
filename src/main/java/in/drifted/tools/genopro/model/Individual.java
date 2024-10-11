@@ -17,92 +17,15 @@ package in.drifted.tools.genopro.model;
 
 import java.util.Set;
 
-public class Individual implements Comparable<Individual> {
-
-    private final String id;
-    private final int key;
-    private final GenoMap genoMap;
-    private final Hyperlink hyperlink;
-    private final Name name;
-    private final Gender gender;
-    private final Birth birth;
-    private final Death death;
-    private final boolean dead;
-    private final boolean anonymized;
-    private final Position position;
-    private final BoundaryRect boundaryRect;
-    private final Set<String> highlightKeySet;
-
-    public Individual(String id, GenoMap genoMap, Hyperlink hyperlink, Name name, Gender gender,
-            Birth birth, Death death, boolean dead, boolean anonymized, Position position,
-            BoundaryRect boundaryRect, Set<String> highlightKeySet) {
-
-        this.id = id;
-        this.key = Integer.parseInt(id.replace("ind", ""));
-        this.genoMap = genoMap;
-        this.hyperlink = hyperlink;
-        this.name = name;
-        this.gender = gender;
-        this.birth = birth;
-        this.death = death;
-        this.dead = dead;
-        this.anonymized = anonymized;
-        this.position = position;
-        this.boundaryRect = boundaryRect;
-        this.highlightKeySet = highlightKeySet;
-    }
+public record Individual(
+        String id, int key, GenoMap genoMap, Hyperlink hyperlink, Name name, Gender gender,
+        Birth birth, Death death, boolean dead, boolean anonymized, Position position,
+        BoundaryRect boundaryRect, Set<String> highlightKeySet)
+        implements Comparable<Individual> {
 
     @Override
     public int compareTo(Individual individual) {
         return Integer.compare(this.key, individual.key);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public GenoMap getGenoMap() {
-        return genoMap;
-    }
-
-    public Hyperlink getHyperlink() {
-        return hyperlink;
-    }
-
-    public Name getName() {
-        return name;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public Birth getBirth() {
-        return birth;
-    }
-
-    public Death getDeath() {
-        return death;
-    }
-
-    public boolean isDead() {
-        return dead;
-    }
-
-    public boolean isAnonymized() {
-        return anonymized;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    public BoundaryRect getBoundaryRect() {
-        return boundaryRect;
-    }
-
-    public Set<String> getHighlightKeySet() {
-        return highlightKeySet;
     }
 
     public boolean isMale() {

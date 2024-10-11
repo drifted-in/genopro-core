@@ -17,36 +17,5 @@ package in.drifted.tools.genopro.model;
 
 import java.util.Set;
 
-public class GenoMapData {
-
-    private final GenoMap genoMap;
-    private final Set<Individual> individualSet;
-    private final Set<Family> familySet;
-    private final Set<Label> labelSet;
-
-    public GenoMapData(GenoMap genoMap, Set<Individual> individualSet,
-            Set<Family> familySet, Set<Label> labelSet) {
-
-        this.genoMap = genoMap;
-        this.individualSet = individualSet;
-        this.familySet = familySet;
-        this.labelSet = labelSet;
-    }
-
-    public GenoMap getGenoMap() {
-        return genoMap;
-    }
-
-    public Set<Individual> getIndividualSet() {
-        return individualSet;
-    }
-
-    public Set<Family> getFamilySet() {
-        return familySet;
-    }
-
-    public Set<Label> getLabelSet() {
-        return labelSet;
-    }
-
+public record GenoMapData(GenoMap genoMap, Set<Individual> individualSet, Set<Family> familySet, Set<Label> labelSet) {
 }

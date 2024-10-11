@@ -15,89 +15,12 @@
  */
 package in.drifted.tools.genopro.model;
 
-import java.text.Normalizer;
-import java.util.Objects;
+import in.drifted.tools.genopro.util.GenoMapIdUtil;
 
-public class GenoMap {
-
-    private final String id;
-    private final String name;
-    private final String title;
-    private final BoundaryRect boundaryRect;
+public record GenoMap(String id, String name, String title, BoundaryRect boundaryRect) {
 
     public GenoMap(String name, String title, BoundaryRect boundaryRect) {
-        this.id = (title != null) ? getId(title) : getId(name);
-        this.name = name;
-        this.title = title;
-        this.boundaryRect = boundaryRect;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(this.id);
-    }
-
-    @Override
-    public boolean equals(Object object) {
-
-        if (this == object) {
-            return true;
-        }
-
-        if (object == null) {
-            return false;
-        }
-
-        if (getClass() != object.getClass()) {
-            return false;
-        }
-
-        final GenoMap other = (GenoMap) object;
-
-        return Objects.equals(this.id, other.id);
-    }
-
-    private static String getId(String title) {
-
-        String id = null;
-
-        if (title != null) {
-
-            StringBuilder idBuilder = new StringBuilder();
-
-            String normalizedTitle = Normalizer.normalize(title, Normalizer.Form.NFD)
-                    .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-
-            for (char c : normalizedTitle.toLowerCase().toCharArray()) {
-
-                if ((c >= 48 && c <= 57) || (c >= 97 && c <= 122)) {
-                    idBuilder.append(c);
-
-                } else {
-                    idBuilder.append(" ");
-                }
-            }
-
-            id = idBuilder.toString().trim().replaceAll("\\s+", "-");
-        }
-
-        return id;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public BoundaryRect getBoundaryRect() {
-        return boundaryRect;
+        this(GenoMapIdUtil.getGenoMapId((title != null) ? title : name), name, title, boundaryRect);
     }
 
 }

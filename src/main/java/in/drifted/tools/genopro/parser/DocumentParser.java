@@ -24,20 +24,20 @@ import in.drifted.tools.genopro.model.Death;
 import in.drifted.tools.genopro.model.DisplayStyle;
 import in.drifted.tools.genopro.model.DocumentInfo;
 import in.drifted.tools.genopro.model.Family;
+import in.drifted.tools.genopro.model.FamilyEvent;
 import in.drifted.tools.genopro.model.FamilyLineType;
+import in.drifted.tools.genopro.model.FamilyRelationType;
 import in.drifted.tools.genopro.model.Gender;
 import in.drifted.tools.genopro.model.GenoDate;
 import in.drifted.tools.genopro.model.GenoMap;
 import in.drifted.tools.genopro.model.Hyperlink;
 import in.drifted.tools.genopro.model.Individual;
-import in.drifted.tools.genopro.model.FamilyEvent;
-import in.drifted.tools.genopro.model.Name;
-import in.drifted.tools.genopro.model.PedigreeLink;
-import in.drifted.tools.genopro.model.Position;
-import in.drifted.tools.genopro.model.FamilyRelationType;
 import in.drifted.tools.genopro.model.Label;
 import in.drifted.tools.genopro.model.LabelStyle;
+import in.drifted.tools.genopro.model.Name;
+import in.drifted.tools.genopro.model.PedigreeLink;
 import in.drifted.tools.genopro.model.PedigreeLinkType;
+import in.drifted.tools.genopro.model.Position;
 import in.drifted.tools.genopro.model.Rect;
 import in.drifted.tools.genopro.model.Size;
 import java.io.IOException;
@@ -69,7 +69,7 @@ public class DocumentParser {
      *
      * @param path path to GenoPro file
      * @return the GenoPro XML document
-     * @throws IOException
+     * @throws IOException if an I/O error occurs while reading the file
      */
     public static Document getDocument(Path path) throws IOException {
 
@@ -173,7 +173,7 @@ public class DocumentParser {
         Set<Individual> individualSet = getIndividualSet(document, genoMapMap, documentParserOptions);
 
         for (Individual individual : individualSet) {
-            individualMap.put(individual.getId(), individual);
+            individualMap.put(individual.id(), individual);
         }
 
         return individualMap;
@@ -199,7 +199,7 @@ public class DocumentParser {
 
             Individual individual = getIndividual(genoMapMap, (Element) nodeList.item(i));
 
-            if (!(individual.getName() == null && documentParserOptions.hasUnknownIndividualsExcluded())) {
+            if (!(individual.name() == null && documentParserOptions.hasUnknownIndividualsExcluded())) {
                 individualSet.add(individual);
             }
         }
@@ -225,11 +225,11 @@ public class DocumentParser {
 
         for (Individual individual : individualSet) {
 
-            individualMap.put(individual.getId(), individual);
+            individualMap.put(individual.id(), individual);
 
-            if (individual.getHyperlink() != null) {
-                hyperlinkMap.put(individual.getId(), individual.getHyperlink().getId());
-                hyperlinkMap.put(individual.getHyperlink().getId(), individual.getId());
+            if (individual.hyperlink() != null) {
+                hyperlinkMap.put(individual.id(), individual.hyperlink().id());
+                hyperlinkMap.put(individual.hyperlink().id(), individual.id());
             }
         }
 
@@ -242,25 +242,25 @@ public class DocumentParser {
 
                 String hyperlinkId = hyperlinkMap.get(individualId);
                 Individual targetIndividual = individualMap.get(hyperlinkId);
-                GenoMap targetGenoMap = targetIndividual.getGenoMap();
+                GenoMap targetGenoMap = targetIndividual.genoMap();
 
                 Hyperlink hyperlink = null;
 
-                if (!(targetGenoMap.getTitle() == null && documentParserOptions.hasUntitledGenoMapsExcluded())) {
-                    hyperlink = new Hyperlink(targetIndividual.getGenoMap(), hyperlinkId);
+                if (!(targetGenoMap.title() == null && documentParserOptions.hasUntitledGenoMapsExcluded())) {
+                    hyperlink = new Hyperlink(targetIndividual.genoMap(), hyperlinkId);
                 }
 
-                if (individual.getHyperlink() == null) {
-                    deduplicatedIndividualSet.add(new Individual(individual.getId(), individual.getGenoMap(),
-                            hyperlink, individual.getName(), individual.getGender(), individual.getBirth(),
-                            individual.getDeath(), individual.isDead(), false, individual.getPosition(),
-                            individual.getBoundaryRect(), individual.getHighlightKeySet()));
+                if (individual.hyperlink() == null) {
+                    deduplicatedIndividualSet.add(new Individual(individual.id(), individual.key(),
+                            individual.genoMap(), hyperlink, individual.name(), individual.gender(), individual.birth(),
+                            individual.death(), individual.dead(), false, individual.position(),
+                            individual.boundaryRect(), individual.highlightKeySet()));
 
                 } else {
-                    deduplicatedIndividualSet.add(new Individual(individual.getId(), individual.getGenoMap(),
-                            hyperlink, targetIndividual.getName(), targetIndividual.getGender(),
-                            targetIndividual.getBirth(), targetIndividual.getDeath(), targetIndividual.isDead(), false,
-                            individual.getPosition(), individual.getBoundaryRect(), individual.getHighlightKeySet()));
+                    deduplicatedIndividualSet.add(new Individual(individual.id(), individual.key(),
+                            individual.genoMap(), hyperlink, targetIndividual.name(), targetIndividual.gender(),
+                            targetIndividual.birth(), targetIndividual.death(), targetIndividual.dead(), false,
+                            individual.position(), individual.boundaryRect(), individual.highlightKeySet()));
                 }
 
             } else {
@@ -282,24 +282,24 @@ public class DocumentParser {
 
         for (Individual individual : individualSet) {
 
-            if (individual.isDead() || (!anonymizeDatesOnly
-                    && individual.getBirth() != null
-                    && individual.getBirth().hasDate()
-                    && individual.getBirth().getDate().getLocalDate().isBefore(anonymizedSinceLocalDate))) {
+            if (individual.dead() || (!anonymizeDatesOnly
+                    && individual.birth() != null
+                    && individual.birth().hasDate()
+                    && individual.birth().date().localDate().isBefore(anonymizedSinceLocalDate))) {
 
                 anonymizedIndividualSet.add(individual);
 
             } else {
                 if (anonymizeDatesOnly) {
-                    anonymizedIndividualSet.add(new Individual(individual.getId(), individual.getGenoMap(),
-                            individual.getHyperlink(), individual.getName(), individual.getGender(), null, null, false,
-                            false, individual.getPosition(), individual.getBoundaryRect(),
-                            individual.getHighlightKeySet()));
+                    anonymizedIndividualSet.add(new Individual(individual.id(), individual.key(), individual.genoMap(),
+                            individual.hyperlink(), individual.name(), individual.gender(), null, null, false,
+                            false, individual.position(), individual.boundaryRect(),
+                            individual.highlightKeySet()));
 
                 } else {
-                    anonymizedIndividualSet.add(new Individual(individual.getId(), individual.getGenoMap(),
-                            null, null, individual.getGender(), null, null, false, true, individual.getPosition(),
-                            individual.getBoundaryRect(), individual.getHighlightKeySet()));
+                    anonymizedIndividualSet.add(new Individual(individual.id(), individual.key(), individual.genoMap(),
+                            null, null, individual.gender(), null, null, false, true, individual.position(),
+                            individual.boundaryRect(), individual.highlightKeySet()));
                 }
             }
         }
@@ -357,13 +357,13 @@ public class DocumentParser {
 
                     if (pedigreeLink.isParent()) {
 
-                        Individual individual = individualMap.get(pedigreeLink.getIndividualId());
+                        Individual individual = individualMap.get(pedigreeLink.individualId());
 
                         if (individual.isMale()) {
-                            fatherId = individual.getId();
+                            fatherId = individual.id();
 
                         } else if (individual.isFemale()) {
-                            motherId = individual.getId();
+                            motherId = individual.id();
                         }
                     }
                 }
@@ -374,9 +374,9 @@ public class DocumentParser {
 
                     if (pedigreeLink.isParent()) {
 
-                        Individual individual = individualMap.get(pedigreeLink.getIndividualId());
+                        Individual individual = individualMap.get(pedigreeLink.individualId());
 
-                        if (individual.isAnonymized()) {
+                        if (individual.anonymized()) {
                             isParentAnonymized = true;
                             break;
                         }
@@ -387,7 +387,7 @@ public class DocumentParser {
 
                 for (PedigreeLink pedigreeLink : pedigreeLinkList) {
                     if (!pedigreeLink.isParent()) {
-                        if (individualMap.get(pedigreeLink.getIndividualId()).isAnonymized()) {
+                        if (individualMap.get(pedigreeLink.individualId()).anonymized()) {
                             isChildAnonymized = true;
                             break;
                         }
@@ -415,7 +415,7 @@ public class DocumentParser {
                     pedigreeLinkList = childlessPedigreeLinkList;
                 }
 
-                if (!(isParentAnonymized && !hasChildren) && !(isParentAnonymized && hasChildren && isChildAnonymized)) {
+                if (!(isParentAnonymized && !hasChildren) && !(isParentAnonymized && isChildAnonymized)) {
 
                     String label = familyNodeValueMap.get("DisplayText");
                     FamilyLineType familyLineType = FamilyLineType.parse(familyNodeValueMap.get("FamilyLine"));
@@ -439,8 +439,8 @@ public class DocumentParser {
                                 + bottomNodeValueMap.get("Right"));
                     }
 
-                    familySet.add(new Family(familyId, fatherId, motherId, genoMap, label, relationType,
-                            familyLineType, familyEventList, pedigreeLinkList, position, topBoundaryRect,
+                    familySet.add(new Family(familyId, getFamilyKey(familyId), fatherId, motherId, genoMap, label,
+                            relationType, familyLineType, familyEventList, pedigreeLinkList, position, topBoundaryRect,
                             bottomBoundaryRect));
                 }
 
@@ -469,7 +469,7 @@ public class DocumentParser {
         Map<String, Position> individualPositionMap = new HashMap<>();
 
         for (Entry<String, Individual> entry : individualMap.entrySet()) {
-            individualPositionMap.put(entry.getKey(), entry.getValue().getPosition());
+            individualPositionMap.put(entry.getKey(), entry.getValue().position());
         }
 
         Map<String, Position> twinPositionMap = getTwinPositionMap(document);
@@ -507,7 +507,7 @@ public class DocumentParser {
             Map<String, String> marriageNodeValueMap = getNodeValueMap(marriageElement);
 
             String id = marriageElement.getAttribute("ID");
-            GenoDate date = new GenoDate(marriageNodeValueMap.get("Date"));
+            GenoDate date = GenoDate.fromDate(marriageNodeValueMap.get("Date"));
             String place = null;
             if (marriageNodeValueMap.containsKey("Place")) {
                 place = placeMap.getOrDefault(marriageNodeValueMap.get("Place"), null);
@@ -576,7 +576,7 @@ public class DocumentParser {
                 Position position = getPosition(positionElement.getFirstChild().getTextContent().trim());
                 int width = Integer.parseInt(positionElement.getAttribute("Width"));
                 int height = Integer.parseInt(positionElement.getAttribute("Height"));
-                Rect rect = new Rect(position.getX(), position.getY(), width, height);
+                Rect rect = new Rect(position.x(), position.y(), width, height);
                 Element textElement = (Element) getSingleNode(labelElement, "Text");
                 String text = textElement.getFirstChild().getTextContent().trim();
                 Element alignmentElement = (Element) getSingleNode(textElement, "Alignment");
@@ -625,6 +625,7 @@ public class DocumentParser {
         Death death = getDeath(individualElement);
 
         String id = individualElement.getAttribute("ID");
+        int key = getIndividualKey(id);
 
         String hyperlink = individualElement.getAttribute("IndividualInternalHyperlink");
 
@@ -646,8 +647,8 @@ public class DocumentParser {
 
         Set<String> highlightKeySet = getHighlightKeySet(individualElement);
 
-        return new Individual(id, genoMap, hyperlink.isEmpty() ? null : new Hyperlink(null, hyperlink), name, gender,
-                birth, death, isDead, false, position, boundaryRect, highlightKeySet);
+        return new Individual(id, key, genoMap, hyperlink.isEmpty() ? null : new Hyperlink(null, hyperlink),
+                name, gender, birth, death, isDead, false, position, boundaryRect, highlightKeySet);
     }
 
     private static GenoMap getGenoMap(Map<String, GenoMap> genoMapMap, String genoMapName) {
@@ -692,7 +693,7 @@ public class DocumentParser {
                 String date = birthMap.get("Date");
                 String comment = birthMap.get("Comment");
 
-                birth = new Birth(new GenoDate(date), comment);
+                birth = new Birth(GenoDate.fromDate(date), comment);
             }
         }
 
@@ -712,7 +713,7 @@ public class DocumentParser {
                 String date = deathMap.get("Date");
                 String comment = deathMap.get("Comment");
 
-                death = new Death(new GenoDate(date), comment);
+                death = new Death(GenoDate.fromDate(date), comment);
             }
         }
 
@@ -742,7 +743,7 @@ public class DocumentParser {
             values[i] = Integer.parseInt(fragments[i]);
         }
 
-        return new BoundaryRect(values[0], values[1], values[2], values[3]);
+        return BoundaryRect.fromPoints(values[0], values[1], values[2], values[3]);
     }
 
     private static Size getSize(String size, Size defaultSize) {
@@ -845,6 +846,14 @@ public class DocumentParser {
         }
 
         return nodeValueMap;
+    }
+
+    private static int getIndividualKey(String individualId) {
+        return Integer.parseInt(individualId.replace("ind", ""));
+    }
+
+    private static int getFamilyKey(String familyId) {
+        return Integer.parseInt(familyId.replace("fam", ""));
     }
 
 }

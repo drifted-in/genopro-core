@@ -31,26 +31,26 @@ public class IndividualBirthDateComparator implements Comparator<Individual> {
     @Override
     public int compare(Individual individual01, Individual individual02) {
 
-        Birth birth01 = individual01.getBirth();
-        Birth birth02 = individual02.getBirth();
+        Birth birth01 = individual01.birth();
+        Birth birth02 = individual02.birth();
 
-        LocalDate birthDate01 = (birth01 != null && birth01.hasDate()) ? birth01.getDate().getLocalDate() : LocalDate.MAX;
-        LocalDate birthDate02 = (birth02 != null && birth02.hasDate()) ? birth02.getDate().getLocalDate() : LocalDate.MAX;
+        LocalDate birthDate01 = (birth01 != null && birth01.hasDate()) ? birth01.date().localDate() : LocalDate.MAX;
+        LocalDate birthDate02 = (birth02 != null && birth02.hasDate()) ? birth02.date().localDate() : LocalDate.MAX;
 
         int result = birthDate01.compareTo(birthDate02);
 
         if (result == 0) {
 
-            String last01 = (individual01.getName().getLast() != null) ? individual01.getName().getLast() : "";
-            String last02 = (individual02.getName().getLast() != null) ? individual02.getName().getLast() : "";
+            String last01 = (individual01.name().last() != null) ? individual01.name().last() : "";
+            String last02 = (individual02.name().last() != null) ? individual02.name().last() : "";
 
             result = last01.compareTo(last02);
         }
 
         if (result == 0) {
 
-            String first01 = (individual01.getName().getFirst() != null) ? individual01.getName().getFirst() : "";
-            String first02 = (individual02.getName().getFirst() != null) ? individual02.getName().getFirst() : "";
+            String first01 = (individual01.name().first() != null) ? individual01.name().first() : "";
+            String first02 = (individual02.name().first() != null) ? individual02.name().first() : "";
 
             result = first01.compareTo(first02);
         }

@@ -15,40 +15,5 @@
  */
 package in.drifted.tools.genopro.model;
 
-public class Label {
-
-    private final GenoMap genoMap;
-    private final String text;
-    private final Rect rect;
-    private final int zIndex;
-    private final LabelStyle labelStyle;
-
-    public Label(GenoMap genoMap, String text, Rect rect, int zIndex, LabelStyle labelStyle) {
-        this.genoMap = genoMap;
-        this.text = text;
-        this.rect = rect;
-        this.zIndex = zIndex;
-        this.labelStyle = labelStyle;
-    }
-
-    public GenoMap getGenoMap() {
-        return genoMap;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public Rect getRect() {
-        return rect;
-    }
-
-    public int getzIndex() {
-        return zIndex;
-    }
-
-    public LabelStyle getLabelStyle() {
-        return labelStyle;
-    }
-
+public record Label(GenoMap genoMap, String text, Rect rect, int zIndex, LabelStyle labelStyle) {
 }

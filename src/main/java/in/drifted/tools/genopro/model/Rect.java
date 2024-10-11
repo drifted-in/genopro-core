@@ -15,43 +15,17 @@
  */
 package in.drifted.tools.genopro.model;
 
-public class Rect {
+public record Rect(int x, int y, int width, int height) {
 
-    private final int x;
-    private final int y;
-    private final int width;
-    private final int height;
-
-    public Rect(int x, int y, int width, int height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
-
-    public Rect(BoundaryRect boundaryRect) {
-        Position topLeft = boundaryRect.getTopLeft();
-        Position bottomRight = boundaryRect.getBottomRight();
-        this.x = topLeft.getX();
-        this.y = topLeft.getY();
-        this.width = bottomRight.getX() - topLeft.getX();
-        this.height = topLeft.getY() - bottomRight.getY();
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
+    public static Rect fromBoundaryRect(BoundaryRect boundaryRect) {
+        Position topLeft = boundaryRect.topLeft();
+        Position bottomRight = boundaryRect.bottomRight();
+        return new Rect(
+                topLeft.x(),
+                topLeft.y(),
+                bottomRight.x() - topLeft.x(),
+                topLeft.y() - bottomRight.y()
+        );
     }
 
 }

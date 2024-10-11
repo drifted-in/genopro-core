@@ -19,8 +19,8 @@ public interface EventDate {
 
     public boolean hasDate();
 
-    public GenoDate getDate();
+    public GenoDate date();
 
-    public String getComment();
+    public String comment();
 
 }

@@ -15,27 +15,11 @@
  */
 package in.drifted.tools.genopro.model;
 
-public class Color {
-
-    private final int r;
-    private final int g;
-    private final int b;
-    private final double a;
-
-    public Color(int r, int g, int b) {
-        this(r, g, b, 1.0);
-    }
-
-    public Color(int r, int g, int b, double a) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = a;
-    }
+public record Color(int r, int g, int b, double a) {
 
     public static Color fromHex(String hex) {
         if (hex == null) {
-            return new Color(0, 0, 0);
+            return new Color(0, 0, 0, 1.0);
         } else if (hex.equals("Transparent")) {
             return new Color(255, 255, 255, 0);
         } else {
@@ -48,60 +32,10 @@ public class Color {
         }
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 71 * hash + this.r;
-        hash = 71 * hash + this.g;
-        hash = 71 * hash + this.b;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Color other = (Color) obj;
-        if (this.r != other.r) {
-            return false;
-        }
-        if (this.g != other.g) {
-            return false;
-        }
-        if (this.b != other.b) {
-            return false;
-        }
-        if (Double.doubleToLongBits(this.a) != Double.doubleToLongBits(other.a)) {
-            return false;
-        }
-        return true;
-    }
-
-    public int getR() {
-        return r;
-    }
-
-    public int getG() {
-        return g;
-    }
-
-    public int getB() {
-        return b;
-    }
-
-    public double getA() {
-        return a;
-    }
-
     public String getHex() {
-        return (a < 1) ? String.format("#%02x%02x%02x%02x", r, g, b, a * 255) : String.format("#%02x%02x%02x", r, g, b);
+        return (a < 1) ?
+                String.format("#%02x%02x%02x%02x", r, g, b, (int) a * 255) :
+                String.format("#%02x%02x%02x", r, g, b);
     }
 
 }

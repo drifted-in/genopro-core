@@ -15,28 +15,5 @@
  */
 package in.drifted.tools.genopro.model;
 
-public class Border {
-
-    private final Color color;
-    private final Size size;
-    private final String pattern;
-
-    public Border(Color color, Size size, String pattern) {
-        this.color = color;
-        this.size = size;
-        this.pattern = pattern;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public Size getSize() {
-        return size;
-    }
-
-    public String getPattern() {
-        return pattern;
-    }
-
+public record Border(Color color, Size size, String pattern) {
 }

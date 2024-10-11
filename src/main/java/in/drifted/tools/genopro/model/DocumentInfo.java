@@ -15,28 +15,5 @@
  */
 package in.drifted.tools.genopro.model;
 
-public class DocumentInfo {
-
-    private final String title;
-    private final String description;
-    private final DisplayStyle displayStyle;
-
-    public DocumentInfo(String title, String description, DisplayStyle displayStyle) {
-        this.title = title;
-        this.description = description;
-        this.displayStyle = displayStyle;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public DisplayStyle getDisplayStyle() {
-        return displayStyle;
-    }
-
+public record DocumentInfo(String title, String description, DisplayStyle displayStyle) {
 }

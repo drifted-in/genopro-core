@@ -17,28 +17,5 @@ package in.drifted.tools.genopro.model;
 
 import java.util.List;
 
-public class FamilyRelation {
-
-    private final String fatherId;
-    private final String motherId;
-    private final List<String> mateIdList;
-
-    public FamilyRelation(String fatherId, String motherId, List<String> mateIdList) {
-        this.fatherId = fatherId;
-        this.motherId = motherId;
-        this.mateIdList = mateIdList;
-    }
-
-    public String getFatherId() {
-        return fatherId;
-    }
-
-    public String getMotherId() {
-        return motherId;
-    }
-
-    public List<String> getMateIdList() {
-        return mateIdList;
-    }
-
+public record FamilyRelation(String fatherId, String motherId, List<String> mateIdList) {
 }

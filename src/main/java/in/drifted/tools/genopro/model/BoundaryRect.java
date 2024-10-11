@@ -15,22 +15,13 @@
  */
 package in.drifted.tools.genopro.model;
 
-public class BoundaryRect {
+public record BoundaryRect(Position topLeft, Position bottomRight) {
 
-    private final Position topLeft;
-    private final Position bottomRight;
-
-    public BoundaryRect(int x1, int y1, int x2, int y2) {
-        this.topLeft = new Position(x1, y1);
-        this.bottomRight = new Position(x2, y2);
-    }
-
-    public Position getTopLeft() {
-        return topLeft;
-    }
-
-    public Position getBottomRight() {
-        return bottomRight;
+    public static BoundaryRect fromPoints(int x1, int y1, int x2, int y2) {
+        return new BoundaryRect(
+                new Position(x1, y1),
+                new Position(x2, y2)
+        );
     }
 
 }

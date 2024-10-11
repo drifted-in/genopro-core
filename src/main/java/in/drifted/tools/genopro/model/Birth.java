@@ -15,29 +15,11 @@
  */
 package in.drifted.tools.genopro.model;
 
-public class Birth implements EventDate {
-
-    private final GenoDate date;
-    private final String comment;
-
-    public Birth(GenoDate date, String comment) {
-        this.date = date;
-        this.comment = comment;
-    }
+public record Birth(GenoDate date, String comment) implements EventDate {
 
     @Override
     public boolean hasDate() {
-        return date != null && date.getDate() != null;
-    }
-
-    @Override
-    public GenoDate getDate() {
-        return date;
-    }
-
-    @Override
-    public String getComment() {
-        return comment;
+        return date != null && date.date() != null;
     }
 
 }

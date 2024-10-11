@@ -15,21 +15,5 @@
  */
 package in.drifted.tools.genopro.model;
 
-public class Hyperlink {
-
-    private final GenoMap genoMap;
-    private final String id;
-
-    public Hyperlink(GenoMap genoMap, String id) {
-        this.genoMap = genoMap;
-        this.id = id;
-    }
-
-    public GenoMap getGenoMap() {
-        return genoMap;
-    }
-
-    public String getId() {
-        return id;
-    }
+public record Hyperlink(GenoMap genoMap, String id) {
 }

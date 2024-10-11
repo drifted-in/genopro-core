@@ -28,8 +28,8 @@ public class IndividualHorizontalPositionComparator implements Comparator<Indivi
 
     @Override
     public int compare(Individual o1, Individual o2) {
-        int result = Integer.compare(o1.getBoundaryRect().getTopLeft().getX(),
-                o2.getBoundaryRect().getTopLeft().getX());
+        int result = Integer.compare(o1.boundaryRect().topLeft().x(),
+                o2.boundaryRect().topLeft().x());
 
         return ascending ? result : -result;
     }

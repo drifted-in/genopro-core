@@ -15,23 +15,24 @@
  */
 package in.drifted.tools.genopro.model;
 
+import in.drifted.tools.genopro.util.formatter.DateFormatter;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
 
-public class GenoDate {
+public record GenoDate(String prefix, LocalDate localDate, String date, boolean yearOnly) {
 
     private static final DateTimeFormatter DATE_IN_FORMATTER
             = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);
 
-    private final String prefix;
-    private final LocalDate localDate;
-    private final String date;
-    private final boolean yearOnly;
+    public static GenoDate fromDate(String date) {
 
-    public GenoDate(String date) {
+        String prefix = null;
+        LocalDate localDate = LocalDate.MAX;
+        String normalizedDate = null;
+        boolean yearOnly = false;
 
         if (date != null && !date.isEmpty()) {
 
@@ -46,30 +47,21 @@ public class GenoDate {
 
             String[] dateFragments = modifiedDate.split(" ");
 
-            this.prefix = rawPrefix;
+            prefix = rawPrefix;
 
             if (dateFragments.length == 3) {
-                this.localDate = LocalDate.parse(modifiedDate, DATE_IN_FORMATTER);
-                this.date = date;
-                this.yearOnly = false;
+                localDate = LocalDate.parse(modifiedDate, DATE_IN_FORMATTER);
+                normalizedDate = date;
 
             } else {
                 int year = Integer.parseInt(dateFragments[dateFragments.length - 1]);
-                this.localDate = LocalDate.of(year, Month.DECEMBER, 31);
-                this.date = prefix + year;
-                this.yearOnly = true;
+                localDate = LocalDate.of(year, Month.DECEMBER, 31);
+                normalizedDate = prefix + year;
+                yearOnly = true;
             }
-
-        } else {
-            this.prefix = null;
-            this.localDate = LocalDate.MAX;
-            this.date = null;
-            this.yearOnly = false;
         }
-    }
 
-    public String getDate() {
-        return date;
+        return new GenoDate(prefix, localDate, normalizedDate, yearOnly);
     }
 
     public String getDate(DateFormatter dateFormatter) {
@@ -96,7 +88,4 @@ public class GenoDate {
         }
     }
 
-    public LocalDate getLocalDate() {
-        return localDate;
-    }
 }
