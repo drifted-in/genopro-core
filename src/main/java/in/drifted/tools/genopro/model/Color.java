@@ -32,7 +32,7 @@ public record Color(int r, int g, int b, double a) {
         }
     }
 
-    public String getHex() {
+    public String toHex() {
         return (a < 1) ?
                 String.format("#%02x%02x%02x%02x", r, g, b, (int) a * 255) :
                 String.format("#%02x%02x%02x", r, g, b);
