@@ -15,12 +15,5 @@
  */
 package in.drifted.tools.genopro.model;
 
-import in.drifted.tools.genopro.util.GenoMapIdUtil;
-
 public record GenoMap(String id, String name, String title, BoundaryRect boundaryRect) {
-
-    public GenoMap(String name, String title, BoundaryRect boundaryRect) {
-        this(GenoMapIdUtil.getGenoMapId((title != null) ? title : name), name, title, boundaryRect);
-    }
-
 }

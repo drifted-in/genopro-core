@@ -40,6 +40,7 @@ import in.drifted.tools.genopro.model.PedigreeLinkType;
 import in.drifted.tools.genopro.model.Position;
 import in.drifted.tools.genopro.model.Rect;
 import in.drifted.tools.genopro.model.Size;
+import in.drifted.tools.genopro.util.GenoMapIdUtil;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -147,8 +148,10 @@ public class DocumentParser {
 
                 if (!boundaryRect.isEmpty()) {
                     Map<String, String> nodeValueMap = getNodeValueMap(element);
+                    String title = nodeValueMap.get("Title");
+                    String id = GenoMapIdUtil.getGenoMapId((title != null) ? title : name);
 
-                    genoMapMap.put(name, new GenoMap(name, nodeValueMap.get("Title"), getBoundaryRect(boundaryRect)));
+                    genoMapMap.put(name, new GenoMap(id, name, title, getBoundaryRect(boundaryRect)));
                 }
             }
         }
