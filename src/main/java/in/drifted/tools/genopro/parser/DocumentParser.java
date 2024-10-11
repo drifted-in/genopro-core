@@ -253,13 +253,13 @@ public class DocumentParser {
                 if (individual.hyperlink() == null) {
                     deduplicatedIndividualSet.add(new Individual(individual.id(), individual.key(),
                             individual.genoMap(), hyperlink, individual.name(), individual.gender(), individual.birth(),
-                            individual.death(), individual.dead(), false, individual.position(),
+                            individual.death(), individual.isDeceased(), false, individual.position(),
                             individual.boundaryRect(), individual.highlightKeySet()));
 
                 } else {
                     deduplicatedIndividualSet.add(new Individual(individual.id(), individual.key(),
                             individual.genoMap(), hyperlink, targetIndividual.name(), targetIndividual.gender(),
-                            targetIndividual.birth(), targetIndividual.death(), targetIndividual.dead(), false,
+                            targetIndividual.birth(), targetIndividual.death(), targetIndividual.isDeceased(), false,
                             individual.position(), individual.boundaryRect(), individual.highlightKeySet()));
                 }
 
@@ -282,7 +282,7 @@ public class DocumentParser {
 
         for (Individual individual : individualSet) {
 
-            if (individual.dead() || (!anonymizeDatesOnly
+            if (individual.isDeceased() || (!anonymizeDatesOnly
                     && individual.birth() != null
                     && individual.birth().hasDate()
                     && individual.birth().date().localDate().isBefore(anonymizedSinceLocalDate))) {
@@ -376,7 +376,7 @@ public class DocumentParser {
 
                         Individual individual = individualMap.get(pedigreeLink.individualId());
 
-                        if (individual.anonymized()) {
+                        if (individual.isAnonymized()) {
                             isParentAnonymized = true;
                             break;
                         }
@@ -387,7 +387,7 @@ public class DocumentParser {
 
                 for (PedigreeLink pedigreeLink : pedigreeLinkList) {
                     if (!pedigreeLink.isParent()) {
-                        if (individualMap.get(pedigreeLink.individualId()).anonymized()) {
+                        if (individualMap.get(pedigreeLink.individualId()).isAnonymized()) {
                             isChildAnonymized = true;
                             break;
                         }

@@ -19,7 +19,7 @@ import java.util.Set;
 
 public record Individual(
         String id, int key, GenoMap genoMap, Hyperlink hyperlink, Name name, Gender gender,
-        Birth birth, Death death, boolean dead, boolean anonymized, Position position,
+        Birth birth, Death death, boolean isDeceased, boolean isAnonymized, Position position,
         BoundaryRect boundaryRect, Set<String> highlightKeySet)
         implements Comparable<Individual> {
 
