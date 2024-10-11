@@ -27,16 +27,12 @@ public enum FamilyRelationType {
             return UNSPECIFIED;
 
         } else {
-            switch (familyRelationType) {
-                case "Marriage":
-                    return MARRIAGE;
-                case "Divorce":
-                    return DIVORCE;
-                case "Separation":
-                    return SEPARATION;
-                default:
-                    return UNSPECIFIED;
-            }
+            return switch (familyRelationType) {
+                case "Marriage" -> MARRIAGE;
+                case "Divorce" -> DIVORCE;
+                case "Separation" -> SEPARATION;
+                default -> UNSPECIFIED;
+            };
         }
     }
 }

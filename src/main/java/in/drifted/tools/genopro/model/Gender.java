@@ -26,14 +26,11 @@ public enum Gender {
             return UNKNOWN;
 
         } else {
-            switch (gender) {
-                case "M":
-                    return MALE;
-                case "F":
-                    return FEMALE;
-                default:
-                    return UNKNOWN;
-            }
+            return switch (gender) {
+                case "M" -> MALE;
+                case "F" -> FEMALE;
+                default -> UNKNOWN;
+            };
         }
     }
 }

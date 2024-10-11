@@ -747,49 +747,36 @@ public class DocumentParser {
     }
 
     private static Size getSize(String size, Size defaultSize) {
-
-        if (size != null) {
-
-            switch (size) {
-                case "T":
-                    return Size.T;
-                case "S":
-                    return Size.S;
-                case "L":
-                    return Size.L;
-                case "M":
-                    return Size.M;
-                case "X":
-                    return Size.XL;
-                case "XX":
-                    return Size.XXL;
-                case "XXX":
-                    return Size.XXXL;
-                case "XXXX":
-                    return Size.XXXXL;
-            }
+        if (size == null) {
+            return defaultSize;
+        } else {
+            return switch (size) {
+                case "T" -> Size.T;
+                case "S" -> Size.S;
+                case "L" -> Size.L;
+                case "M" -> Size.M;
+                case "X" -> Size.XL;
+                case "XX" -> Size.XXL;
+                case "XXX" -> Size.XXXL;
+                case "XXXX" -> Size.XXXXL;
+                default -> defaultSize;
+            };
         }
-        return defaultSize;
     }
 
     private static Alignment getAlignment(String alignment, Alignment defaultAlignment) {
-
-        if (alignment != null) {
-
-            switch (alignment) {
-                case "Center":
-                    return Alignment.CENTER;
-                case "Top":
-                    return Alignment.TOP;
-                case "Left":
-                    return Alignment.LEFT;
-                case "Bottom":
-                    return Alignment.BOTTOM;
-                case "Right":
-                    return Alignment.RIGHT;
-            }
+        if (alignment == null) {
+            return defaultAlignment;
+        } else {
+            return switch (alignment) {
+                case "Center" -> Alignment.CENTER;
+                case "Top" -> Alignment.TOP;
+                case "Left" -> Alignment.LEFT;
+                case "Bottom" -> Alignment.BOTTOM;
+                case "Right" -> Alignment.RIGHT;
+                default -> defaultAlignment;
+            };
         }
-        return defaultAlignment;
     }
 
     private static Set<String> getHighlightKeySet(Element individualElement) {

@@ -27,16 +27,12 @@ public enum PedigreeLinkType {
             return UNSPECIFIED;
 
         } else {
-            switch (pedigreeLinkType) {
-                case "Biological":
-                    return BIOLOGICAL;
-                case "Parent":
-                    return PARENT;
-                case "Adopted":
-                    return ADOPTED;
-                default:
-                    return UNSPECIFIED;
-            }
+            return switch (pedigreeLinkType) {
+                case "Biological" -> BIOLOGICAL;
+                case "Parent" -> PARENT;
+                case "Adopted" -> ADOPTED;
+                default -> UNSPECIFIED;
+            };
         }
     }
 }

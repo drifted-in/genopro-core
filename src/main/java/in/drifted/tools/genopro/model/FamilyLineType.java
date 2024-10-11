@@ -27,16 +27,12 @@ public enum FamilyLineType {
             return UNSPECIFIED;
 
         } else {
-            switch (familyLineType) {
-                case "NoMoreChildren":
-                    return NO_MORE_CHILDREN;
-                case "PossiblyMoreChildren":
-                    return POSSIBLY_MORE_CHILDREN;
-                case "ToBeCompleted":
-                    return TO_BE_COMPLETED;
-                default:
-                    return UNSPECIFIED;
-            }
+            return switch (familyLineType) {
+                case "NoMoreChildren" -> NO_MORE_CHILDREN;
+                case "PossiblyMoreChildren" -> POSSIBLY_MORE_CHILDREN;
+                case "ToBeCompleted" -> TO_BE_COMPLETED;
+                default -> UNSPECIFIED;
+            };
         }
     }
 }

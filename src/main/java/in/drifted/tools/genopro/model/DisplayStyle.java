@@ -31,22 +31,15 @@ public enum DisplayStyle {
             return NOTHING;
 
         } else {
-            switch (displayStyle) {
-                case "YoB_YoD":
-                    return YEAR_OF_BIRTH_AND_YEAR_OF_DEATH;
-                case "DoB_DoD":
-                    return DATE_OF_BIRTH_AND_DATE_OF_DEATH;
-                case "DoB_DoD_2lines":
-                    return DATE_OF_BIRTH_AND_DATE_OF_DEATH_ON_SEPARATE_LINES;
-                case "YoB_YoD_ID":
-                    return YEAR_OF_BIRTH_AND_YEAR_OF_DEATH_ID;
-                case "DoB_DoD_ID":
-                    return DATE_OF_BIRTH_AND_DATE_OF_DEATH_ID;
-                case "ID":
-                    return ID;
-                default:
-                    return YEAR_OF_BIRTH_AND_YEAR_OF_DEATH;
-            }
+            return switch (displayStyle) {
+                case "YoB_YoD" -> YEAR_OF_BIRTH_AND_YEAR_OF_DEATH;
+                case "DoB_DoD" -> DATE_OF_BIRTH_AND_DATE_OF_DEATH;
+                case "DoB_DoD_2lines" -> DATE_OF_BIRTH_AND_DATE_OF_DEATH_ON_SEPARATE_LINES;
+                case "YoB_YoD_ID" -> YEAR_OF_BIRTH_AND_YEAR_OF_DEATH_ID;
+                case "DoB_DoD_ID" -> DATE_OF_BIRTH_AND_DATE_OF_DEATH_ID;
+                case "ID" -> ID;
+                default -> YEAR_OF_BIRTH_AND_YEAR_OF_DEATH;
+            };
         }
     }
 }
