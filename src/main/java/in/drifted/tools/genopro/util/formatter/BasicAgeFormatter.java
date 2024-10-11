@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.tools.genopro.model;
+package in.drifted.tools.genopro.util.formatter;
 
+import in.drifted.tools.genopro.model.Birth;
+import in.drifted.tools.genopro.model.Death;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ResourceBundle;
