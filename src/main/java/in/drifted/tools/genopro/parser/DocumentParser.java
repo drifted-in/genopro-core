@@ -826,8 +826,7 @@ public class DocumentParser {
 
             childNode = childNode.getNextSibling();
 
-            if (childNode instanceof Element) {
-                Element element = (Element) childNode;
+            if (childNode instanceof Element element) {
                 nodeValueMap.put(element.getTagName(), element.getTextContent());
             }
         }
