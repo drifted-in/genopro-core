@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.tools.genopro;
+package in.drifted.tools.genopro.parser;
 
 import in.drifted.tools.genopro.model.Alignment;
 import in.drifted.tools.genopro.model.Birth;
@@ -32,7 +32,6 @@ import in.drifted.tools.genopro.model.Hyperlink;
 import in.drifted.tools.genopro.model.Individual;
 import in.drifted.tools.genopro.model.FamilyEvent;
 import in.drifted.tools.genopro.model.Name;
-import in.drifted.tools.genopro.model.ParserOptions;
 import in.drifted.tools.genopro.model.PedigreeLink;
 import in.drifted.tools.genopro.model.Position;
 import in.drifted.tools.genopro.model.FamilyRelationType;
@@ -63,7 +62,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class DataParser {
+public class DocumentParser {
 
     /**
      * Returns the GenoPro XML document.
@@ -163,15 +162,15 @@ public class DataParser {
      *
      * @param document GenoPro XML document
      * @param genoMapMap map of all GenoMaps
-     * @param parserOptions parser options
+     * @param documentParserOptions parser options
      * @return the map of all individuals
      */
     public static Map<String, Individual> getIndividualMap(Document document, Map<String, GenoMap> genoMapMap,
-            ParserOptions parserOptions) {
+            DocumentParserOptions documentParserOptions) {
 
         Map<String, Individual> individualMap = new HashMap<>();
 
-        Set<Individual> individualSet = getIndividualSet(document, genoMapMap, parserOptions);
+        Set<Individual> individualSet = getIndividualSet(document, genoMapMap, documentParserOptions);
 
         for (Individual individual : individualSet) {
             individualMap.put(individual.getId(), individual);
@@ -186,11 +185,11 @@ public class DataParser {
      *
      * @param document GenoPro XML document
      * @param genoMapMap map of all GenoMaps
-     * @param parserOptions parser options
+     * @param documentParserOptions parser options
      * @return the set of all individuals
      */
     public static Set<Individual> getIndividualSet(Document document, Map<String, GenoMap> genoMapMap,
-            ParserOptions parserOptions) {
+            DocumentParserOptions documentParserOptions) {
 
         Set<Individual> individualSet = new HashSet<>();
 
@@ -200,24 +199,24 @@ public class DataParser {
 
             Individual individual = getIndividual(genoMapMap, (Element) nodeList.item(i));
 
-            if (!(individual.getName() == null && parserOptions.hasUnknownIndividualsExcluded())) {
+            if (!(individual.getName() == null && documentParserOptions.hasUnknownIndividualsExcluded())) {
                 individualSet.add(individual);
             }
         }
 
-        if (parserOptions.hasHyperlinkedIndividualInstancesDeduplicated()) {
-            individualSet = getDeduplicatedIndividualSet(individualSet, parserOptions);
+        if (documentParserOptions.hasHyperlinkedIndividualInstancesDeduplicated()) {
+            individualSet = getDeduplicatedIndividualSet(individualSet, documentParserOptions);
         }
 
-        if (parserOptions.getAnonymizedSinceDate() != null) {
-            individualSet = getAnonymizedIndividualSet(individualSet, parserOptions);
+        if (documentParserOptions.getAnonymizedSinceDate() != null) {
+            individualSet = getAnonymizedIndividualSet(individualSet, documentParserOptions);
         }
 
         return individualSet;
     }
 
     private static Set<Individual> getDeduplicatedIndividualSet(Set<Individual> individualSet,
-            ParserOptions parserOptions) {
+            DocumentParserOptions documentParserOptions) {
 
         Set<Individual> deduplicatedIndividualSet = new HashSet<>();
 
@@ -247,7 +246,7 @@ public class DataParser {
 
                 Hyperlink hyperlink = null;
 
-                if (!(targetGenoMap.getTitle() == null && parserOptions.hasUntitledGenoMapsExcluded())) {
+                if (!(targetGenoMap.getTitle() == null && documentParserOptions.hasUntitledGenoMapsExcluded())) {
                     hyperlink = new Hyperlink(targetIndividual.getGenoMap(), hyperlinkId);
                 }
 
@@ -273,11 +272,11 @@ public class DataParser {
     }
 
     private static Set<Individual> getAnonymizedIndividualSet(Set<Individual> individualSet,
-            ParserOptions parserOptions) {
+            DocumentParserOptions documentParserOptions) {
 
         Set<Individual> anonymizedIndividualSet = new HashSet<>();
 
-        LocalDate anonymizedSinceLocalDate = parserOptions.getAnonymizedSinceDate();
+        LocalDate anonymizedSinceLocalDate = documentParserOptions.getAnonymizedSinceDate();
 
         boolean anonymizeDatesOnly = anonymizedSinceLocalDate.equals(LocalDate.now());
 

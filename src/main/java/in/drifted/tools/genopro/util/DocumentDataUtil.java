@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.tools.genopro;
+package in.drifted.tools.genopro.util;
 
-import in.drifted.tools.genopro.model.DateFormatter;
+import in.drifted.tools.genopro.parser.DocumentParser;
+import in.drifted.tools.genopro.util.formatter.DateFormatter;
 import in.drifted.tools.genopro.model.EventDate;
 import in.drifted.tools.genopro.model.Family;
 import in.drifted.tools.genopro.model.FamilyRelation;
 import in.drifted.tools.genopro.model.GenoMap;
 import in.drifted.tools.genopro.model.GenoMapData;
-import in.drifted.tools.genopro.model.IndividualHorizontalPositionComparator;
+import in.drifted.tools.genopro.util.comparator.IndividualHorizontalPositionComparator;
 import in.drifted.tools.genopro.model.Individual;
 import in.drifted.tools.genopro.model.Label;
-import in.drifted.tools.genopro.model.ParserOptions;
+import in.drifted.tools.genopro.parser.DocumentParserOptions;
 import in.drifted.tools.genopro.model.PedigreeLink;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,31 +36,31 @@ import java.util.Map;
 import java.util.Set;
 import org.w3c.dom.Document;
 
-public class DataUtil {
+public class DocumentDataUtil {
 
     /**
      * Returns the collection of data for each GenoMap. This result can be
      * pre-filtered if specific parser options are enabled.
      *
      * @param document GenoPro XML document
-     * @param parserOptions parser options
+     * @param documentParserOptions parser options
      * @return the collection of data for each GenoMap
      */
-    public static List<GenoMapData> getGenoMapDataList(Document document, ParserOptions parserOptions) {
+    public static List<GenoMapData> getGenoMapDataList(Document document, DocumentParserOptions documentParserOptions) {
 
         List<GenoMapData> genoMapDataList = new ArrayList<>();
 
-        Map<String, GenoMap> genoMapMap = DataParser.getGenoMapMap(document);
-        Map<String, String> placeMap = DataParser.getPlaceMap(document);
-        Map<String, Individual> individualMap = DataParser.getIndividualMap(document, genoMapMap, parserOptions);
-        Map<String, List<PedigreeLink>> familyPedigreeLinkMap = DataParser.getFamilyPedigreeLinkMap(
+        Map<String, GenoMap> genoMapMap = DocumentParser.getGenoMapMap(document);
+        Map<String, String> placeMap = DocumentParser.getPlaceMap(document);
+        Map<String, Individual> individualMap = DocumentParser.getIndividualMap(document, genoMapMap, documentParserOptions);
+        Map<String, List<PedigreeLink>> familyPedigreeLinkMap = DocumentParser.getFamilyPedigreeLinkMap(
                 document, individualMap);
-        Set<Family> familySet = DataParser.getFamilySet(
+        Set<Family> familySet = DocumentParser.getFamilySet(
                 document, genoMapMap, individualMap, familyPedigreeLinkMap, placeMap);
         Set<Label> labelSet = new HashSet<>();
 
-        if (!parserOptions.hasTextLabelsExcluded()) {
-            labelSet = DataParser.getLabelSet(document, genoMapMap);
+        if (!documentParserOptions.hasTextLabelsExcluded()) {
+            labelSet = DocumentParser.getLabelSet(document, genoMapMap);
         }
 
         Map<GenoMap, Set<Individual>> genoMapIndividualMap = new HashMap<>();
@@ -93,7 +94,7 @@ public class DataUtil {
         }
 
         for (GenoMap genoMap : genoMapMap.values()) {
-            if (!(genoMap.getTitle() == null && parserOptions.hasUntitledGenoMapsExcluded())) {
+            if (!(genoMap.getTitle() == null && documentParserOptions.hasUntitledGenoMapsExcluded())) {
                 genoMapDataList.add(new GenoMapData(genoMap, genoMapIndividualMap.get(genoMap),
                         familyMap.get(genoMap), labelMap.get(genoMap)));
             }

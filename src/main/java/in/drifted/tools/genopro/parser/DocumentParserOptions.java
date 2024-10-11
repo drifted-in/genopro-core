@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package in.drifted.tools.genopro.model;
+package in.drifted.tools.genopro.parser;
 
 import java.time.LocalDate;
 
-public class ParserOptions {
+public class DocumentParserOptions {
 
     private boolean textLabelsExcluded = false;
     private boolean untitledGenoMapsExcluded = false;
