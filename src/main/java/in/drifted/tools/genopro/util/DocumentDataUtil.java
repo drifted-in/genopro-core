@@ -221,7 +221,7 @@ public class DocumentDataUtil {
         String formattedDate = "";
 
         if (date != null && date.hasDate()) {
-            formattedDate = date.date().getDate(dateFormatter);
+            formattedDate = date.date().format(dateFormatter);
         }
 
         return formattedDate;

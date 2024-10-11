@@ -64,7 +64,7 @@ public record GenoDate(String prefix, LocalDate localDate, String date, boolean 
         return new GenoDate(prefix, localDate, normalizedDate, yearOnly);
     }
 
-    public String getDate(DateFormatter dateFormatter) {
+    public String format(DateFormatter dateFormatter) {
 
         if (prefix != null) {
 
