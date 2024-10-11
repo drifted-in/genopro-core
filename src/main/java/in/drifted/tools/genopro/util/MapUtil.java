@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 
 public class MapUtil {
 
-    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map, Comparator comparator) {
+    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map, Comparator<V> comparator) {
 
         Map<K, V> result = new LinkedHashMap<>();
 
