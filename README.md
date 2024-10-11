@@ -13,10 +13,10 @@ library that anybody could reuse.
 
 ## Limitations
 
-This library covers just a limited subset of GNO file format capabilities. Currently it supports:
+This library covers just a limited subset of GNO file format capabilities. Currently, it supports:
 - basic genomaps details
 - basic individual details
-- basic family relation details
+- basic pedigree links details
 - basic text label details
 
 ## Parsing options
